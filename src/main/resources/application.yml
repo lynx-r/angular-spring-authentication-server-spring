@@ -1,0 +1,7 @@
+spring:
+  profiles:
+    active: dev
+  mustache.check-template-location: false
+
+HEADERS: Content-Type,Content-Length,Access-Control-Allow-Origin,Content-Encoding,Vary,user-roles
+METHODS: GET,POST,PUT,OPTIONS,HEADER,DELETE

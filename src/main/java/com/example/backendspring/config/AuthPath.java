@@ -1,22 +1,23 @@
 package com.example.backendspring.config;
 
-
 import com.example.backendspring.model.EnumSecureRole;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public enum Path implements IPath {
+public enum AuthPath implements IPath {
   HOME("/", false, new HashSet<>()),
-  PING("ping", true, Constants.SECURE_PING_PONG_ROLES),
-  PONG("pong", true, Constants.SECURE_PING_PONG_ROLES);
+  REGISTER("/register", false, new HashSet<>()),
+  AUTHORIZE("/authorize", false, new HashSet<>()),
+  AUTHENTICATE("/authenticate", false, new HashSet<>()),
+  LOGOUT("/logout", false, new HashSet<>());
 
   private String path;
   private boolean secure;
   private Set<EnumSecureRole> roles;
 
-  Path(String path, boolean secure, Set<EnumSecureRole> roles) {
+  AuthPath(String path, boolean secure, Set<EnumSecureRole> roles) {
     this.path = path;
     this.secure = secure;
     this.roles = roles;
@@ -27,7 +28,7 @@ public enum Path implements IPath {
     return path;
   }
 
-  public Path setPath(String path) {
+  public AuthPath setPath(String path) {
     this.path = path;
     return this;
   }
@@ -37,7 +38,7 @@ public enum Path implements IPath {
     return secure;
   }
 
-  public Path setSecure(boolean secure) {
+  public AuthPath setSecure(boolean secure) {
     this.secure = secure;
     return this;
   }
@@ -47,12 +48,12 @@ public enum Path implements IPath {
     return roles;
   }
 
-  public Path setRoles(Set<EnumSecureRole> roles) {
+  public AuthPath setRoles(Set<EnumSecureRole> roles) {
     this.roles = roles;
     return this;
   }
 
   public static class Constants {
-    public static final HashSet<EnumSecureRole> SECURE_PING_PONG_ROLES = new HashSet<>(Arrays.asList(EnumSecureRole.ADMIN, EnumSecureRole.AUTHOR));
+    public static final HashSet<EnumSecureRole> SECURE_USER_ROLES = new HashSet<>(Arrays.asList(EnumSecureRole.ADMIN, EnumSecureRole.AUTHOR));
   }
 }

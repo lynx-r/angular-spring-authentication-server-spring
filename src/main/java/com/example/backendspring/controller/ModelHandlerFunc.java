@@ -11,9 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by Aleksey Popryaduhin on 10:52 29/09/2017.
  */
+@FunctionalInterface
 public interface ModelHandlerFunc<T extends Payload> extends BaseHandlerFunc<T> {
 
-  default Answer handleRequest(HttpServletRequest request, HttpServletResponse response, IPath path, T body) {
+  default Answer handleRequest(HttpServletRequest request, HttpServletResponse response,
+                               IPath path, T body) {
     Answer answer = getAnswer(request, response, path, body);
     response.setStatus(answer.getStatusCode());
     return answer;

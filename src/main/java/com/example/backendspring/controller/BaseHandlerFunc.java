@@ -7,15 +7,16 @@ import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumSecureRole;
 import com.example.backendspring.model.Payload;
-import com.example.backendspring.service.SecureUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.example.backendspring.config.RequestConstants.*;
+import static com.example.backendspring.config.RequestConstants.USER_ROLE_HEADER;
+import static com.example.backendspring.service.SecureUtils.getSessionAndSetCookieInResponse;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 
 /**
@@ -23,50 +24,24 @@ import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
  */
 public interface BaseHandlerFunc<T extends Payload> {
 
-  Answer process(T data, Optional<AuthUser> token);
-
-  Optional<AuthUser> isAuthenticated(AuthUser authUser);
+  Answer process(T data);
 
   default Answer getAnswer(HttpServletRequest request, HttpServletResponse response, IPath path, T data) {
-    String userSession = getOrCreateSession(request, response);
-    String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
     String roleStr = request.getHeader(USER_ROLE_HEADER);
 
     Set<EnumSecureRole> roles = new HashSet<>(Collections.singletonList(EnumSecureRole.ANONYMOUS));
     if (StringUtils.isNotBlank(roleStr)) {
       roles = EnumSecureRole.parseRoles(roleStr);
     }
-    AuthUser internalUserRole = getInternalUserRole(accessToken, userSession);
     if (path.isSecure() || EnumSecureRole.isSecure(roles)) {
-      Optional<AuthUser> authenticated = isAuthenticated(internalUserRole);
-      if (!authenticated.isPresent()) {
+      Answer processed = process(data);
+      if (processed == null) {
         return getForbiddenAnswer(response);
       }
-      AuthUser securedUser = authenticated.get();
-      if (!hasRights(securedUser.getRoles(), path)) {
-        return getForbiddenAnswer(response);
-      }
-      Answer securedAnswer = getSecureAnswer(data, securedUser);
-      if (securedAnswer == null) {
-        return getForbiddenAnswer(response);
-      }
-      return securedAnswer;
+      return processed;
     } else {
-      return getInsecureAnswer(data, internalUserRole);
+      return getInsecureAnswer(data);
     }
-  }
-
-  default boolean hasRights(Set<EnumSecureRole> roles, IPath path) {
-    if (roles.contains(EnumSecureRole.BAN)) {
-      return false;
-    }
-    return path.getRoles().isEmpty() || path.getRoles().containsAll(roles);
-  }
-
-  default Answer getSecureAnswer(T data, AuthUser authenticated) {
-    Answer processed = process(data, Optional.of(authenticated));
-    processed.setAuthUser(authenticated);
-    return processed;
   }
 
   default Answer getForbiddenAnswer(HttpServletResponse response) {
@@ -78,59 +53,11 @@ public interface BaseHandlerFunc<T extends Payload> {
         .message(HTTP_FORBIDDEN, ErrorMessages.UNABLE_TO_AUTHENTICATE);
   }
 
-  default Answer getInsecureAnswer(T data, AuthUser authUser) {
-    Answer process = process(data, Optional.ofNullable(authUser));
+  default Answer getInsecureAnswer(T data) {
+    Answer process = process(data);
     if (process.getBody() instanceof AuthUser) {
       process.setAuthUser((AuthUser) process.getBody());
     }
     return process;
-  }
-
-  default String getOrCreateSession(HttpServletRequest request, HttpServletResponse response) {
-    // take user session which user got after login
-    String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
-    if (StringUtils.isBlank(accessToken)) {
-      // if anonymous user
-      String anonymousSession = getCookieValue(request, ANONYMOUS_SESSION_HEADER);
-//      String anonymousSession = request.cookie(ANONYMOUS_SESSION_HEADER);
-      if (StringUtils.isBlank(anonymousSession)) {
-        anonymousSession = getSessionAndSetCookieInResponse(response);
-      }
-      // return anonym session
-      return anonymousSession;
-    }
-    // return transfer session
-    return request.getHeader(USER_SESSION_HEADER);
-  }
-
-  /**
-   * if does not have session give it him
-   *
-   * @return generate session and set cookie
-   * @param response
-   */
-  default String getSessionAndSetCookieInResponse(HttpServletResponse response) {
-    String anonymousSession = SecureUtils.getRandomString(SESSION_LENGTH);
-    Cookie cookie = new Cookie(ANONYMOUS_SESSION_HEADER, anonymousSession);
-    cookie.setMaxAge(COOKIE_AGE);
-    cookie.setHttpOnly(true);
-    response.addCookie(cookie);
-    System.out.println("Set-Cookie " + ANONYMOUS_SESSION_HEADER + ": " + anonymousSession);
-    return anonymousSession;
-  }
-
-  default AuthUser getInternalUserRole(String accessToken, String userSession) {
-    if (StringUtils.isBlank(accessToken) || StringUtils.isBlank(userSession)) {
-      return new AuthUser(userSession).setRole(EnumSecureRole.ANONYMOUS);
-    }
-    return new AuthUser(accessToken, userSession).setRole(EnumSecureRole.INTERNAL);
-  }
-
-  default String getCookieValue(HttpServletRequest req, String cookieName) {
-    return Arrays.stream(req.getCookies())
-        .filter(c -> c.getName().equals(cookieName))
-        .findFirst()
-        .map(Cookie::getValue)
-        .orElse(null);
   }
 }

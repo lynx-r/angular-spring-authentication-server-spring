@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 //@JsonDeserialize(using = AnswerDeserializer.class)
@@ -52,5 +53,9 @@ public class Answer {
   public Answer message(int code, String message) {
     setMessage(new MessageResponse(code, message));
     return this;
+  }
+
+  public static Answer forbidden() {
+    return Answer.error(HTTP_FORBIDDEN, "Доступ запрещен");
   }
 }

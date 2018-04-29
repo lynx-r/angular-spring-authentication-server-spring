@@ -1,5 +1,6 @@
 package com.example.backendspring.service;
 
+import com.example.backendspring.model.PingPayload;
 import com.example.backendspring.model.PongPayload;
 import org.springframework.stereotype.Service;
 
@@ -11,8 +12,8 @@ import java.util.Optional;
 @Service
 public class PingPongService {
 
-  public Optional<PongPayload> getPong() {
-    return Optional.of(new PongPayload("PONG"));
+  public Optional<PongPayload> getPong(PingPayload data) {
+    return Optional.of(new PongPayload(data.getPing() + " PONG"));
   }
 
 }

@@ -8,6 +8,7 @@ import com.example.backendspring.model.SecureUser;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -27,6 +28,7 @@ public class SecureUserService {
   private Logger logger = LoggerFactory.getLogger(SecureUserService.class);
   private SecureUserDao secureUserDao;
 
+  @Autowired
   public SecureUserService(SecureUserDao secureUserDao) {
     this.secureUserDao = secureUserDao;
   }
