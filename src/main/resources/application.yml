@@ -1,9 +1,6 @@
 spring:
   profiles:
-    active: dev
-  mustache.check-template-location: false
-
-logging.level.com.example: debug
+    active: @spring.profiles.active@
 
 TOKEN_LENGTH: 16
 RANDOM_STRING_LENGTH: 20
