@@ -28,45 +28,45 @@
 
     .
     └── backendspring
-        ├── BackendspringApplication.java		# Spring приложение
+        ├── BackendspringApplication.java		    # Spring приложение
         ├── config
         │   ├── AppProperties.java
-        │   ├── AuthAuthority.java			# Описание доступов для контроллера авторизации пользователей
-        │   ├── CorsFilterAdapter.java			# Описание CORS
+        │   ├── AuthAuthority.java			        # Описание доступов для контроллера авторизации пользователей
+        │   ├── CorsFilterAdapter.java			    # Описание CORS
         │   ├── ErrorMessages.java
-        │   ├── IAuthority.java				# Интерфейс для описания доступов
+        │   ├── IAuthority.java				        # Интерфейс для описания доступов
         │   ├── RequestConstants.java
-        │   ├── SecuredAuthority.java			# Описание доступов для защищенного контроллера
-        │   └── SecurityConfig.java			# Конфигурация CORS через Spring Security
+        │   ├── SecuredAuthority.java		    	# Описание доступов для защищенного контроллера
+        │   └── SecurityConfig.java                 # Конфигурация CORS через Spring Security
         ├── controller
-        │   ├── AuthController.java			# Контроллер аутентификации
+        │   ├── AuthController.java			        # Контроллер аутентификации
         │   └── ProtectedPingPongController.java	# Защищенный контроллер
         ├── dao
         │   ├── BaseDao.java
-        │   └── SecureUserDao.java			# DAO для хранящегося в базе информации о пользователе
+        │   └── SecureUserDao.java			        # DAO для хранящегося в базе информации о пользователе
         ├── exception
         │   ├── AuthException.java
         │   └── PingPongException.java
         ├── function
-        │   ├── BaseHandlerFunc.java			# Рутинные методы аутентификации для функционального интерфейса ModelHandlerFunc.java
-        │   ├── TrustedHandlerFunc.java		# Функциональный интерфейс обрабатывающий проверенные запросы клиента
-        │   └── SecureHandlerFunc.java		# Функциональный интерфейс выполняющий проверку запросов клиента
+        │   ├── BaseHandlerFunc.java			    # Рутинные методы аутентификации для функционального интерфейса ModelHandlerFunc.java
+        │   ├── TrustedHandlerFunc.java		        # Функциональный интерфейс обрабатывающий проверенные запросы клиента
+        │   └── SecureHandlerFunc.java		        # Функциональный интерфейс выполняющий проверку запросов клиента
         ├── model
-        │   ├── Answer.java				# Структура - ответ сервера
-        │   ├── AuthUser.java				# Данные о пользователе используемые для его аутентификации
+        │   ├── Answer.java				            # Структура - ответ сервера
+        │   ├── AuthUser.java				        # Данные о пользователе используемые для его аутентификации
         │   ├── BaseDomain.java
-        │   ├── EnumAuthority.java			# Enum с описание доступов на сайт
+        │   ├── EnumAuthority.java			        # Enum с описание доступов на сайт
         │   ├── MessagePayload.java
         │   ├── MessageResponse.java
-        │   ├── Payload.java				# Интерфейс с описание классов для сериализации/десериализации в JSON
-        │   ├── PingPayload.java			# Данные, которые получаем от клиента
-        │   ├── PongPayload.java			# Данные, которые возвращаем клиенту
-        │   ├── RegisterUser.java			# Информация для регистрации/аутентифкации пользователя
-        │   └── SecureUser.java			# Хранимая в БД информация о пользователе
+        │   ├── Payload.java				        # Интерфейс с описание классов для сериализации/десериализации в JSON
+        │   ├── PingPayload.java			        # Данные, которые получаем от клиента
+        │   ├── PongPayload.java			        # Данные, которые возвращаем клиенту
+        │   ├── RegisterUser.java			        # Информация для регистрации/аутентифкации пользователя
+        │   └── SecureUser.java			            # Хранимая в БД информация о пользователе
         └── service
-            ├── PingPongService.java			# Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
-            ├── SecureUserService.java			# Собственно, сервис в котором производится аутентификация/авторизация
-            └── SecureUtils.java				# Сервис для шифрования данных пользователя
+            ├── PingPongService.java			    # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
+            ├── SecureUserService.java			    # Собственно, сервис в котором производится аутентификация/авторизация
+            └── SecureUtils.java				    # Сервис для шифрования данных пользователя
     
     8 directories, 32 files
 
