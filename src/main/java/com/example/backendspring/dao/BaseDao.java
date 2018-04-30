@@ -10,16 +10,13 @@ import static java.lang.String.format;
 
 public class BaseDao<T extends BaseDomain> {
 
-  protected Logger logger;
-  private final Class<T> clazz;
+  private Logger logger;
 
-  protected Map<String, T> db = new HashMap<>();
+  Map<String, T> db = new HashMap<>();
 
-  protected BaseDao(Class<T> clazz) {
-    this.clazz = clazz;
-
+  BaseDao(Class<T> clazz) {
     logger = LoggerFactory.getLogger(clazz);
-    }
+  }
 
   public void save(final T entity) {
     if (entity == null) {

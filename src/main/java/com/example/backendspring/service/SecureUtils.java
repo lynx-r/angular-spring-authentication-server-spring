@@ -9,12 +9,15 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 public class SecureUtils {
 
@@ -61,5 +64,16 @@ public class SecureUtils {
 
   public static String getRandomString(int length) {
     return RandomStringUtils.randomAlphanumeric(length);
+  }
+
+  public static String getCookieValue(HttpServletRequest req, String cookieName) {
+    if (req.getCookies() != null) {
+      return Arrays.stream(req.getCookies())
+          .filter(c -> c.getName().equals(cookieName))
+          .findFirst()
+          .map(Cookie::getValue)
+          .orElse(null);
+    }
+    return req.getSession(true).getId();
   }
 }

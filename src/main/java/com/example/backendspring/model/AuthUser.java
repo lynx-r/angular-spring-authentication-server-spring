@@ -36,14 +36,9 @@ public class AuthUser implements Payload {
         Collections.singleton(EnumSecureRole.ANONYMOUS));
   }
 
-  public static AuthUser simpleAuthor(String userId, String username, String accessToken, String userSession) {
-    return new AuthUser(userId, username, accessToken, userSession,
-        Collections.singleton(EnumSecureRole.ANONYMOUS));
-  }
-
-  public static AuthUser simpleUser(String userId, String username, String accessToken, String userSession, Set<EnumSecureRole> roles) {
-    return new AuthUser(userId, username, accessToken, userSession,
-        roles);
+  public static AuthUser simpleUser(String userId, String username, String accessToken, String userSession,
+                                    Set<EnumSecureRole> roles) {
+    return new AuthUser(userId, username, accessToken, userSession, roles);
   }
 
   public AuthUser setRole(EnumSecureRole role) {

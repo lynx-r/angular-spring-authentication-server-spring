@@ -3,14 +3,12 @@ package com.example.backendspring.config;
 
 import com.example.backendspring.model.EnumSecureRole;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public enum SecuredPath implements IPath {
-  HOME("/", false, new HashSet<>()),
-  PING("ping", true, Constants.SECURE_PING_PONG_ROLES),
-  PONG("pong", true, Constants.SECURE_PING_PONG_ROLES);
+  PING("ping", true, Constants.SECURE_PING_PONG_ROLES);
 
   private String path;
   private boolean secure;
@@ -53,6 +51,6 @@ public enum SecuredPath implements IPath {
   }
 
   public static class Constants {
-    public static final HashSet<EnumSecureRole> SECURE_PING_PONG_ROLES = new HashSet<>(Arrays.asList(EnumSecureRole.ADMIN, EnumSecureRole.AUTHOR));
+    public static final HashSet<EnumSecureRole> SECURE_PING_PONG_ROLES = new HashSet<>(Collections.singletonList(EnumSecureRole.USER));
   }
 }

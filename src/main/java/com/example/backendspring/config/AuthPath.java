@@ -2,12 +2,11 @@ package com.example.backendspring.config;
 
 import com.example.backendspring.model.EnumSecureRole;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public enum AuthPath implements IPath {
-  HOME("/", false, new HashSet<>()),
   REGISTER("/register", false, new HashSet<>()),
   AUTHORIZE("/authorize", false, new HashSet<>()),
   AUTHENTICATE("/authenticate", false, new HashSet<>()),
@@ -54,6 +53,6 @@ public enum AuthPath implements IPath {
   }
 
   public static class Constants {
-    public static final HashSet<EnumSecureRole> SECURE_USER_ROLES = new HashSet<>(Arrays.asList(EnumSecureRole.ADMIN, EnumSecureRole.AUTHOR));
+    public static final HashSet<EnumSecureRole> SECURE_USER_ROLES = new HashSet<>(Collections.singletonList(EnumSecureRole.USER));
   }
 }

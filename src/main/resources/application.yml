@@ -5,5 +5,8 @@ spring:
 
 logging.level.com.example: debug
 
+TOKEN_LENGTH: 16
+RANDOM_STRING_LENGTH: 20
+
 HEADERS: Content-Type,Content-Length,Access-Control-Allow-Origin,Content-Encoding,Vary,user-roles,access-token,user-session
 METHODS: GET,POST,PUT,OPTIONS,HEADER,DELETE

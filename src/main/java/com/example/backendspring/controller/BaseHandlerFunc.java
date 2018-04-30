@@ -51,7 +51,7 @@ public interface BaseHandlerFunc<T extends Payload> {
         .setRole(EnumSecureRole.ANONYMOUS);
     return Answer.created(authUser)
         .statusCode(HTTP_FORBIDDEN)
-        .message(HTTP_FORBIDDEN, ErrorMessages.UNABLE_TO_AUTHENTICATE);
+        .message(HTTP_FORBIDDEN, ErrorMessages.getString(ErrorMessages.UNABLE_AUTHENTICATE));
   }
 
   default Answer getInsecureAnswer(T data) {
@@ -73,7 +73,6 @@ public interface BaseHandlerFunc<T extends Payload> {
     cookie.setMaxAge(COOKIE_AGE);
     cookie.setHttpOnly(true);
     response.addCookie(cookie);
-    System.out.println("Set-Cookie " + ANONYMOUS_SESSION_HEADER + ": " + anonymousSession);
     return anonymousSession;
   }
 }

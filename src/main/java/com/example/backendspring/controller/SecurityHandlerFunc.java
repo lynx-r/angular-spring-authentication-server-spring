@@ -6,13 +6,12 @@ import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumSecureRole;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.example.backendspring.config.RequestConstants.*;
+import static com.example.backendspring.service.SecureUtils.getCookieValue;
 
 /**
  * Created by Aleksey Popryaduhin on 16:37 01/10/2017.
@@ -40,9 +39,6 @@ public interface SecurityHandlerFunc {
   }
 
   default boolean hasRights(Set<EnumSecureRole> roles, IPath path) {
-    if (roles.contains(EnumSecureRole.BAN)) {
-      return false;
-    }
     return path.getRoles().isEmpty() || path.getRoles().containsAll(roles);
   }
 
@@ -62,17 +58,6 @@ public interface SecurityHandlerFunc {
     if (StringUtils.isBlank(accessToken) || StringUtils.isBlank(userSession)) {
       return new AuthUser(userSession).setRole(EnumSecureRole.ANONYMOUS);
     }
-    return new AuthUser(accessToken, userSession).setRole(EnumSecureRole.INTERNAL);
-  }
-
-  default String getCookieValue(HttpServletRequest req, String cookieName) {
-    if (req.getCookies() != null) {
-      return Arrays.stream(req.getCookies())
-          .filter(c -> c.getName().equals(cookieName))
-          .findFirst()
-          .map(Cookie::getValue)
-          .orElse(null);
-    }
-    return req.getSession(true).getId();
+    return new AuthUser(accessToken, userSession);
   }
 }

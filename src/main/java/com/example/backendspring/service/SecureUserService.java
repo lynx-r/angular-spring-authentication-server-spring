@@ -1,5 +1,6 @@
 package com.example.backendspring.service;
 
+import com.example.backendspring.config.AppProperties;
 import com.example.backendspring.dao.SecureUserDao;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumSecureRole;
@@ -17,8 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.example.backendspring.config.Constants.TOKEN_LENGTH;
-
 /**
  * Created by Aleksey Popryadukhin on 16/04/2018.
  */
@@ -27,10 +26,12 @@ public class SecureUserService {
 
   private Logger logger = LoggerFactory.getLogger(SecureUserService.class);
   private SecureUserDao secureUserDao;
+  private AppProperties appProperties;
 
   @Autowired
-  public SecureUserService(SecureUserDao secureUserDao) {
+  public SecureUserService(SecureUserDao secureUserDao, AppProperties appProperties) {
     this.secureUserDao = secureUserDao;
+    this.appProperties = appProperties;
   }
 
   public Optional<AuthUser> register(RegisterUser registerUser) {
@@ -41,10 +42,10 @@ public class SecureUserService {
         return Optional.empty();
       }
       SecureUser secureUser = new SecureUser();
-      secureUser.setId(SecureUtils.getRandomString(TOKEN_LENGTH));
+      secureUser.setId(SecureUtils.getRandomString(appProperties.getRandomStringLength()));
       secureUser.setUsername(username);
 
-      secureUser.setTokenLength(TOKEN_LENGTH);
+      secureUser.setTokenLength(appProperties.getTokenLength());
 
       // hash credentials
       hashCredentials(registerUser, secureUser);
@@ -57,7 +58,7 @@ public class SecureUserService {
       secureUser.setSecureToken(accessToken.secureToken);
       secureUser.setAccessToken(accessToken.accessToken);
       secureUser.setUserSession(userSession);
-      secureUser.addRole(EnumSecureRole.AUTHOR);
+      secureUser.addRole(EnumSecureRole.USER);
       secureUserDao.save(secureUser);
 
       // send access token and userSession
@@ -114,14 +115,12 @@ public class SecureUserService {
     return secureUserOptional.map((secureUser) -> {
       boolean isAuth = isAuthed(accessToken, secureUser);
       if (isAuth) {
-        if (!authUser.getRoles().contains(EnumSecureRole.INTERNAL)) {
-          TokenPair updatedAccessToken = getAccessToken(secureUser);
-          secureUser.setAccessToken(updatedAccessToken.accessToken);
-          secureUser.setSecureToken(updatedAccessToken.secureToken);
-          secureUserDao.save(secureUser);
-          authUser.setAccessToken(updatedAccessToken.accessToken);
-        }
+        TokenPair updatedAccessToken = getAccessToken(secureUser);
+        secureUser.setAccessToken(updatedAccessToken.accessToken);
+        secureUser.setSecureToken(updatedAccessToken.secureToken);
+        secureUserDao.save(secureUser);
 
+        authUser.setAccessToken(updatedAccessToken.accessToken);
         authUser.setUsername(secureUser.getUsername());
         authUser.setUserId(secureUser.getId());
         authUser.setRoles(secureUser.getRoles());
@@ -162,7 +161,7 @@ public class SecureUserService {
   }
 
   private String getUserSession() {
-    return SecureUtils.getRandomString(TOKEN_LENGTH);
+    return SecureUtils.getRandomString(appProperties.getRandomStringLength());
   }
 
   private void hashCredentials(RegisterUser registerUser, SecureUser secureUser) throws NoSuchAlgorithmException {
