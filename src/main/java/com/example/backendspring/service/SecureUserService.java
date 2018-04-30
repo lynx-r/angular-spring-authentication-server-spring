@@ -65,7 +65,7 @@ public class SecureUserService {
       AuthUser authUser = AuthUser.simpleUser(secureUser.getId(), username, accessToken.accessToken, userSession, secureUser.getAuthorities());
       return Optional.of(authUser);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("UNREGISTERED: " + registerUser, e.getMessage());
       return Optional.empty();
     }
   }
@@ -99,7 +99,7 @@ public class SecureUserService {
               return authUser;
             }
           } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("UNAUTHORIZED: " + registerUser, e.getMessage());
           }
           return null;
         });
