@@ -1,8 +1,8 @@
 package com.example.backendspring.controller;
 
 import com.example.backendspring.config.SecuredAuthority;
-import com.example.backendspring.function.ModelHandlerFunc;
-import com.example.backendspring.function.SecurityHandlerFunc;
+import com.example.backendspring.function.TrustedHandlerFunc;
+import com.example.backendspring.function.SecureHandlerFunc;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.PingPayload;
 import com.example.backendspring.service.PingPongService;
@@ -32,15 +32,15 @@ public class ProtectedPingPongController {
   @PostMapping("ping")
   public @ResponseBody
   Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
-    return ((SecurityHandlerFunc) authUser ->
+    return ((SecureHandlerFunc) authUser ->
         secureUserService.authenticate(authUser) // Авторизуем пользователя
     ).getAuthUser(request, SecuredAuthority.PING)
         .map(authUser -> // получаме авторизованного пользователя
-            ((ModelHandlerFunc<PingPayload>) (data) ->
+            ((TrustedHandlerFunc<PingPayload>) (data) ->
                 pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
                     .map(Answer::ok)
                     .orElseGet(Answer::forbidden)
-            ).handleRequest(request, response, SecuredAuthority.PING, ping) // обрабатываем запрос
+            ).handleRequest(response, ping, authUser) // обрабатываем запрос
         ).orElseGet(Answer::forbidden);
   }
 }

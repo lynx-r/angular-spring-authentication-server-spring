@@ -63,8 +63,8 @@ public class SecureUser extends BaseDomain {
    */
   private String userSession;
 
-  public void addRole(EnumAuthority role) {
-    authorities.add(role);
+  public void addAuthority(EnumAuthority authority) {
+    authorities.add(authority);
   }
 
   @Override

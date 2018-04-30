@@ -58,7 +58,7 @@ public class SecureUserService {
       secureUser.setSecureToken(accessToken.secureToken);
       secureUser.setAccessToken(accessToken.accessToken);
       secureUser.setUserSession(userSession);
-      secureUser.addRole(EnumAuthority.USER);
+      secureUser.addAuthority(EnumAuthority.USER);
       secureUserDao.save(secureUser);
 
       // send access token and userSession
@@ -144,7 +144,7 @@ public class SecureUserService {
         secureUser.setUserSession("");
         secureUserDao.save(secureUser);
       }
-      return AuthUser.anonymous();
+      return null;
     });
   }
 

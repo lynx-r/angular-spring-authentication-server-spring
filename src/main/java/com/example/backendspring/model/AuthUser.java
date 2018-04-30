@@ -46,8 +46,8 @@ public class AuthUser implements Payload {
     return this;
   }
 
-  public AuthUser addAuthority(EnumAuthority authority) {
-    this.authorities.add(authority);
+  public AuthUser setAuthorities(Set<EnumAuthority> authorities) {
+    this.authorities = authorities;
     return this;
   }
 }
