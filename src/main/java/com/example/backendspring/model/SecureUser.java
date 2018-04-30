@@ -21,7 +21,7 @@ public class SecureUser extends BaseDomain {
 
   private String username;
 
-  private Set<EnumSecureRole> roles = new HashSet<>();
+  private Set<EnumAuthority> authorities = new HashSet<>();
 
   /**
    * hash of user:password:salt
@@ -63,8 +63,8 @@ public class SecureUser extends BaseDomain {
    */
   private String userSession;
 
-  public void addRole(EnumSecureRole role) {
-    roles.add(role);
+  public void addRole(EnumAuthority role) {
+    authorities.add(role);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class SecureUser extends BaseDomain {
     return new ToStringBuilder(this)
         .append("id", id)
         .append("username", username)
-        .append("roles", roles)
+        .append("authorities", authorities)
         .append("accessToken", accessToken)
         .append("userSession", userSession)
         .toString();

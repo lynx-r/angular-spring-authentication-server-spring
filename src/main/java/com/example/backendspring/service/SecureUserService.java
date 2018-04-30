@@ -3,7 +3,7 @@ package com.example.backendspring.service;
 import com.example.backendspring.config.AppProperties;
 import com.example.backendspring.dao.SecureUserDao;
 import com.example.backendspring.model.AuthUser;
-import com.example.backendspring.model.EnumSecureRole;
+import com.example.backendspring.model.EnumAuthority;
 import com.example.backendspring.model.RegisterUser;
 import com.example.backendspring.model.SecureUser;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -58,11 +58,11 @@ public class SecureUserService {
       secureUser.setSecureToken(accessToken.secureToken);
       secureUser.setAccessToken(accessToken.accessToken);
       secureUser.setUserSession(userSession);
-      secureUser.addRole(EnumSecureRole.USER);
+      secureUser.addRole(EnumAuthority.USER);
       secureUserDao.save(secureUser);
 
       // send access token and userSession
-      AuthUser authUser = AuthUser.simpleUser(secureUser.getId(), username, accessToken.accessToken, userSession, secureUser.getRoles());
+      AuthUser authUser = AuthUser.simpleUser(secureUser.getId(), username, accessToken.accessToken, userSession, secureUser.getAuthorities());
       return Optional.of(authUser);
     } catch (Exception e) {
       e.printStackTrace();
@@ -93,8 +93,8 @@ public class SecureUserService {
 
               // send access token and userSession
               String userId = secureUser.getId();
-              Set<EnumSecureRole> roles = secureUser.getRoles();
-              AuthUser authUser = AuthUser.simpleUser(userId, username, accessToken.accessToken, userSession, roles);
+              Set<EnumAuthority> authorities = secureUser.getAuthorities();
+              AuthUser authUser = AuthUser.simpleUser(userId, username, accessToken.accessToken, userSession, authorities);
               logger.info("AUTHORIZED: " + authUser);
               return authUser;
             }
@@ -106,7 +106,7 @@ public class SecureUserService {
   }
 
   public Optional<AuthUser> authenticate(AuthUser authUser) {
-    if (authUser.getRoles().contains(EnumSecureRole.ANONYMOUS)) {
+    if (authUser.getAuthorities().contains(EnumAuthority.ANONYMOUS)) {
       return Optional.empty();
     }
     String session = authUser.getUserSession();
@@ -123,7 +123,7 @@ public class SecureUserService {
         authUser.setAccessToken(updatedAccessToken.accessToken);
         authUser.setUsername(secureUser.getUsername());
         authUser.setUserId(secureUser.getId());
-        authUser.setRoles(secureUser.getRoles());
+        authUser.setAuthorities(secureUser.getAuthorities());
         logger.info("AUTHENTICATED: " + authUser);
         return authUser;
       }

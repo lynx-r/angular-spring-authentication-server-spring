@@ -1,6 +1,6 @@
 package com.example.backendspring.controller;
 
-import com.example.backendspring.config.SecuredPath;
+import com.example.backendspring.config.SecuredAuthority;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.PingPayload;
 import com.example.backendspring.service.PingPongService;
@@ -32,13 +32,13 @@ public class ProtectedPingPongController {
   Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
     return ((SecurityHandlerFunc) authUser ->
         secureUserService.authenticate(authUser) // Авторизуем пользователя
-    ).getAuthUser(request, SecuredPath.PING)
+    ).getAuthUser(request, SecuredAuthority.PING)
         .map(authUser -> // получаме авторизованного пользователя
             ((ModelHandlerFunc<PingPayload>) (data) ->
                 pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
                     .map(Answer::ok)
                     .orElseGet(Answer::forbidden)
-            ).handleRequest(request, response, SecuredPath.PING, ping) // обрабатываем запрос
+            ).handleRequest(request, response, SecuredAuthority.PING, ping) // обрабатываем запрос
         ).orElseGet(Answer::forbidden);
   }
 }

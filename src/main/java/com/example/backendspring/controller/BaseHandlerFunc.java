@@ -2,10 +2,10 @@ package com.example.backendspring.controller;
 
 
 import com.example.backendspring.config.ErrorMessages;
-import com.example.backendspring.config.IPath;
+import com.example.backendspring.config.IAuthority;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
-import com.example.backendspring.model.EnumSecureRole;
+import com.example.backendspring.model.EnumAuthority;
 import com.example.backendspring.model.Payload;
 import com.example.backendspring.service.SecureUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,14 +27,14 @@ public interface BaseHandlerFunc<T extends Payload> {
 
   Answer process(T data);
 
-  default Answer getAnswer(HttpServletRequest request, HttpServletResponse response, IPath path, T data) {
+  default Answer getAnswer(HttpServletRequest request, HttpServletResponse response, IAuthority path, T data) {
     String roleStr = request.getHeader(USER_ROLE_HEADER);
 
-    Set<EnumSecureRole> roles = new HashSet<>(Collections.singletonList(EnumSecureRole.ANONYMOUS));
+    Set<EnumAuthority> authorities = new HashSet<>(Collections.singletonList(EnumAuthority.ANONYMOUS));
     if (StringUtils.isNotBlank(roleStr)) {
-      roles = EnumSecureRole.parseRoles(roleStr);
+      authorities = EnumAuthority.parseAuthorities(roleStr);
     }
-    if (path.isSecure() || EnumSecureRole.isSecure(roles)) {
+    if (EnumAuthority.isSecure(authorities)) {
       Answer processed = process(data);
       if (processed == null) {
         return getAnonymousAnswer(response);
@@ -48,7 +48,7 @@ public interface BaseHandlerFunc<T extends Payload> {
   default Answer getAnonymousAnswer(HttpServletResponse response) {
     String anonymousSession = putSessionAndSetCookieInResponse(response);
     AuthUser authUser = new AuthUser(anonymousSession)
-        .setRole(EnumSecureRole.ANONYMOUS);
+        .setAuthority(EnumAuthority.ANONYMOUS);
     return Answer.created(authUser)
         .statusCode(HTTP_FORBIDDEN)
         .message(HTTP_FORBIDDEN, ErrorMessages.getString(ErrorMessages.UNABLE_AUTHENTICATE));

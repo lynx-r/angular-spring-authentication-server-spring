@@ -1,9 +1,9 @@
 package com.example.backendspring.controller;
 
-import com.example.backendspring.config.IPath;
+import com.example.backendspring.config.IAuthority;
 import com.example.backendspring.exception.AuthException;
 import com.example.backendspring.model.AuthUser;
-import com.example.backendspring.model.EnumSecureRole;
+import com.example.backendspring.model.EnumAuthority;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,25 +21,22 @@ public interface SecurityHandlerFunc {
 
   Optional<AuthUser> isAuthenticated(AuthUser authUser);
 
-  default Optional<AuthUser> getAuthUser(HttpServletRequest request, IPath path) {
+  default Optional<AuthUser> getAuthUser(HttpServletRequest request, IAuthority path) {
     String userSession = getOrCreateSession(request);
     String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
 
     AuthUser clientAuthUser = getClientAuthUser(accessToken, userSession);
-    if (path.isSecure()) {
-      return isAuthenticated(clientAuthUser)
-          .map(authUser -> {
-            if (!hasRights(authUser.getRoles(), path)) {
-              throw new AuthException();
-            }
-            return authUser;
-          });
-    }
-    return Optional.of(AuthUser.anonymous());
+    return isAuthenticated(clientAuthUser)
+        .map(authUser -> {
+          if (!hasRights(authUser.getAuthorities(), path)) {
+            throw new AuthException();
+          }
+          return authUser;
+        });
   }
 
-  default boolean hasRights(Set<EnumSecureRole> roles, IPath path) {
-    return path.getRoles().isEmpty() || path.getRoles().containsAll(roles);
+  default boolean hasRights(Set<EnumAuthority> authorities, IAuthority path) {
+    return path.getAuthorities().isEmpty() || path.getAuthorities().containsAll(authorities);
   }
 
   default String getOrCreateSession(HttpServletRequest request) {
@@ -56,7 +53,7 @@ public interface SecurityHandlerFunc {
 
   default AuthUser getClientAuthUser(String accessToken, String userSession) {
     if (StringUtils.isBlank(accessToken) || StringUtils.isBlank(userSession)) {
-      return new AuthUser(userSession).setRole(EnumSecureRole.ANONYMOUS);
+      return new AuthUser(userSession).setAuthority(EnumAuthority.ANONYMOUS);
     }
     return new AuthUser(accessToken, userSession);
   }

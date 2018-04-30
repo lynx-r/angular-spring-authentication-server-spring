@@ -20,7 +20,7 @@ public class AuthUser implements Payload {
   private String username;
   private String accessToken;
   private String userSession;
-  private Set<EnumSecureRole> roles = new HashSet<>();
+  private Set<EnumAuthority> authorities = new HashSet<>();
 
   public AuthUser(String userSession) {
     this.userSession = userSession;
@@ -33,21 +33,21 @@ public class AuthUser implements Payload {
 
   public static AuthUser anonymous() {
     return new AuthUser(null, null, null, null,
-        Collections.singleton(EnumSecureRole.ANONYMOUS));
+        Collections.singleton(EnumAuthority.ANONYMOUS));
   }
 
   public static AuthUser simpleUser(String userId, String username, String accessToken, String userSession,
-                                    Set<EnumSecureRole> roles) {
-    return new AuthUser(userId, username, accessToken, userSession, roles);
+                                    Set<EnumAuthority> authorities) {
+    return new AuthUser(userId, username, accessToken, userSession, authorities);
   }
 
-  public AuthUser setRole(EnumSecureRole role) {
-    this.roles = Collections.singleton(role);
+  public AuthUser setAuthority(EnumAuthority authority) {
+    this.authorities = Collections.singleton(authority);
     return this;
   }
 
-  public AuthUser addRole(EnumSecureRole role) {
-    this.roles.add(role);
+  public AuthUser addAuthority(EnumAuthority authority) {
+    this.authorities.add(authority);
     return this;
   }
 }

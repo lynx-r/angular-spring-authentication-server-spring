@@ -1,6 +1,6 @@
 package com.example.backendspring.controller;
 
-import com.example.backendspring.config.AuthPath;
+import com.example.backendspring.config.AuthAuthority;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.RegisterUser;
@@ -33,7 +33,7 @@ public class AuthController {
         secureUserService.register(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleRequest(request, response, AuthPath.REGISTER, registerUser);
+        .handleRequest(request, response, AuthAuthority.REGISTER, registerUser);
   }
 
   @PostMapping("authorize")
@@ -44,7 +44,7 @@ public class AuthController {
         secureUserService.authorize(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleRequest(request, response, AuthPath.AUTHORIZE, registerUser);
+        .handleRequest(request, response, AuthAuthority.AUTHORIZE, registerUser);
   }
 
   @PostMapping("authenticate")
@@ -55,7 +55,7 @@ public class AuthController {
         secureUserService.authenticate(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleRequest(request, response, AuthPath.AUTHENTICATE, registerUser);
+        .handleRequest(request, response, AuthAuthority.AUTHENTICATE, registerUser);
   }
 
   @PostMapping("logout")
@@ -66,6 +66,6 @@ public class AuthController {
         secureUserService.logout(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleRequest(request, response, AuthPath.LOGOUT, registerUser);
+        .handleRequest(request, response, AuthAuthority.LOGOUT, registerUser);
   }
 }
