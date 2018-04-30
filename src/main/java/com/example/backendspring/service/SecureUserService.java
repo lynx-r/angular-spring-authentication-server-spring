@@ -41,6 +41,7 @@ public class SecureUserService {
         return Optional.empty();
       }
       SecureUser secureUser = new SecureUser();
+      secureUser.setId(SecureUtils.getRandomString(TOKEN_LENGTH));
       secureUser.setUsername(username);
 
       secureUser.setTokenLength(TOKEN_LENGTH);
@@ -118,7 +119,6 @@ public class SecureUserService {
           secureUser.setAccessToken(updatedAccessToken.accessToken);
           secureUser.setSecureToken(updatedAccessToken.secureToken);
           secureUserDao.save(secureUser);
-          authUser.setCounter(authUser.getCounter() + 1);
           authUser.setAccessToken(updatedAccessToken.accessToken);
         }
 

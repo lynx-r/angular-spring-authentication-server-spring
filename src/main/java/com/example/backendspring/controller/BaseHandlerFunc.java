@@ -7,16 +7,17 @@ import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumSecureRole;
 import com.example.backendspring.model.Payload;
+import com.example.backendspring.service.SecureUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.example.backendspring.config.RequestConstants.USER_ROLE_HEADER;
-import static com.example.backendspring.service.SecureUtils.getSessionAndSetCookieInResponse;
+import static com.example.backendspring.config.RequestConstants.*;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 
 /**
@@ -36,7 +37,7 @@ public interface BaseHandlerFunc<T extends Payload> {
     if (path.isSecure() || EnumSecureRole.isSecure(roles)) {
       Answer processed = process(data);
       if (processed == null) {
-        return getForbiddenAnswer(response);
+        return getAnonymousAnswer(response);
       }
       return processed;
     } else {
@@ -44,8 +45,8 @@ public interface BaseHandlerFunc<T extends Payload> {
     }
   }
 
-  default Answer getForbiddenAnswer(HttpServletResponse response) {
-    String anonymousSession = getSessionAndSetCookieInResponse(response);
+  default Answer getAnonymousAnswer(HttpServletResponse response) {
+    String anonymousSession = putSessionAndSetCookieInResponse(response);
     AuthUser authUser = new AuthUser(anonymousSession)
         .setRole(EnumSecureRole.ANONYMOUS);
     return Answer.created(authUser)
@@ -59,5 +60,20 @@ public interface BaseHandlerFunc<T extends Payload> {
       process.setAuthUser((AuthUser) process.getBody());
     }
     return process;
+  }
+
+  /**
+   * if does not have session give it him
+   *
+   * @return generate session and set cookie
+   */
+  default String putSessionAndSetCookieInResponse(HttpServletResponse response) {
+    String anonymousSession = SecureUtils.getRandomString(SESSION_LENGTH);
+    Cookie cookie = new Cookie(ANONYMOUS_SESSION_HEADER, anonymousSession);
+    cookie.setMaxAge(COOKIE_AGE);
+    cookie.setHttpOnly(true);
+    response.addCookie(cookie);
+    System.out.println("Set-Cookie " + ANONYMOUS_SESSION_HEADER + ": " + anonymousSession);
+    return anonymousSession;
   }
 }

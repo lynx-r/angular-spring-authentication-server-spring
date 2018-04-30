@@ -9,18 +9,12 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import static com.example.backendspring.config.RequestConstants.ANONYMOUS_SESSION_HEADER;
-import static com.example.backendspring.config.RequestConstants.COOKIE_AGE;
-import static com.example.backendspring.config.RequestConstants.SESSION_LENGTH;
 
 public class SecureUtils {
 
@@ -67,21 +61,5 @@ public class SecureUtils {
 
   public static String getRandomString(int length) {
     return RandomStringUtils.randomAlphanumeric(length);
-  }
-
-  /**
-   * if does not have session give it him
-   *
-   * @return generate session and set cookie
-   * @param response
-   */
-  public static String getSessionAndSetCookieInResponse(HttpServletResponse response) {
-    String anonymousSession = SecureUtils.getRandomString(SESSION_LENGTH);
-    Cookie cookie = new Cookie(ANONYMOUS_SESSION_HEADER, anonymousSession);
-    cookie.setMaxAge(COOKIE_AGE);
-    cookie.setHttpOnly(true);
-    response.addCookie(cookie);
-    System.out.println("Set-Cookie " + ANONYMOUS_SESSION_HEADER + ": " + anonymousSession);
-    return anonymousSession;
   }
 }

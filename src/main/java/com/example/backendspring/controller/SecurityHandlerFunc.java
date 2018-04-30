@@ -1,48 +1,40 @@
 package com.example.backendspring.controller;
 
 import com.example.backendspring.config.IPath;
+import com.example.backendspring.exception.AuthException;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumSecureRole;
-import com.example.backendspring.model.Payload;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
 import static com.example.backendspring.config.RequestConstants.*;
-import static com.example.backendspring.service.SecureUtils.getSessionAndSetCookieInResponse;
 
 /**
  * Created by Aleksey Popryaduhin on 16:37 01/10/2017.
  */
 @FunctionalInterface
-public interface SecurityHandlerFunc<T extends Payload> {
+public interface SecurityHandlerFunc {
 
   Optional<AuthUser> isAuthenticated(AuthUser authUser);
 
-  default Optional<AuthUser> getAuthUser(HttpServletRequest request, HttpServletResponse response, IPath path) {
-    String userSession = getOrCreateSession(request, response);
+  default Optional<AuthUser> getAuthUser(HttpServletRequest request, IPath path) {
+    String userSession = getOrCreateSession(request);
     String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
 
-    AuthUser internalUserRole = getInternalUserRole(accessToken, userSession);
+    AuthUser clientAuthUser = getClientAuthUser(accessToken, userSession);
     if (path.isSecure()) {
-      Optional<AuthUser> authenticated = isAuthenticated(internalUserRole);
-      if (!authenticated.isPresent()) {
-        return getForbidden(response);
-      }
-      AuthUser securedUser = authenticated.get();
-      if (!hasRights(securedUser.getRoles(), path)) {
-        return getForbidden(response);
-      }
-      Optional<AuthUser> securedAnswer = getSecureAnswer(securedUser);
-      if (securedAnswer == null) {
-        return getForbidden(response);
-      }
-      return securedAnswer;
+      return isAuthenticated(clientAuthUser)
+          .map(authUser -> {
+            if (!hasRights(authUser.getRoles(), path)) {
+              throw new AuthException();
+            }
+            return authUser;
+          });
     }
     return Optional.of(AuthUser.anonymous());
   }
@@ -54,34 +46,19 @@ public interface SecurityHandlerFunc<T extends Payload> {
     return path.getRoles().isEmpty() || path.getRoles().containsAll(roles);
   }
 
-  default Optional<AuthUser> getSecureAnswer(AuthUser authenticated) {
-    return isAuthenticated(authenticated);
-  }
-
-  default Optional<AuthUser> getForbidden(HttpServletResponse response) {
-    String anonymousSession = getSessionAndSetCookieInResponse(response);
-    return Optional.of(new AuthUser(anonymousSession)
-        .setRole(EnumSecureRole.ANONYMOUS));
-  }
-
-  default String getOrCreateSession(HttpServletRequest request, HttpServletResponse response) {
+  default String getOrCreateSession(HttpServletRequest request) {
     // take user session which user got after login
     String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
     if (StringUtils.isBlank(accessToken)) {
-      // if anonymous user
-      String anonymousSession = getCookieValue(request, ANONYMOUS_SESSION_HEADER);
-      if (StringUtils.isBlank(anonymousSession)) {
-        anonymousSession = getSessionAndSetCookieInResponse(response);
-      }
       // return anonym session
-      return anonymousSession;
+      return getCookieValue(request, ANONYMOUS_SESSION_HEADER);
     }
     // return transfer session
     return request.getHeader(USER_SESSION_HEADER);
   }
 
 
-  default AuthUser getInternalUserRole(String accessToken, String userSession) {
+  default AuthUser getClientAuthUser(String accessToken, String userSession) {
     if (StringUtils.isBlank(accessToken) || StringUtils.isBlank(userSession)) {
       return new AuthUser(userSession).setRole(EnumSecureRole.ANONYMOUS);
     }
@@ -89,10 +66,13 @@ public interface SecurityHandlerFunc<T extends Payload> {
   }
 
   default String getCookieValue(HttpServletRequest req, String cookieName) {
-    return Arrays.stream(req.getCookies())
-        .filter(c -> c.getName().equals(cookieName))
-        .findFirst()
-        .map(Cookie::getValue)
-        .orElse(null);
+    if (req.getCookies() != null) {
+      return Arrays.stream(req.getCookies())
+          .filter(c -> c.getName().equals(cookieName))
+          .findFirst()
+          .map(Cookie::getValue)
+          .orElse(null);
+    }
+    return req.getSession(true).getId();
   }
 }

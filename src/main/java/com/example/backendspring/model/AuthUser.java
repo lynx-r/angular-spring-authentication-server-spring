@@ -20,8 +20,6 @@ public class AuthUser implements Payload {
   private String username;
   private String accessToken;
   private String userSession;
-  private int counter;
-  private String filterExpression;
   private Set<EnumSecureRole> roles = new HashSet<>();
 
   public AuthUser(String userSession) {
@@ -34,17 +32,17 @@ public class AuthUser implements Payload {
   }
 
   public static AuthUser anonymous() {
-    return new AuthUser(null, null, null, null, 0, "",
+    return new AuthUser(null, null, null, null,
         Collections.singleton(EnumSecureRole.ANONYMOUS));
   }
 
   public static AuthUser simpleAuthor(String userId, String username, String accessToken, String userSession) {
-    return new AuthUser(userId, username, accessToken, userSession, 0, "",
+    return new AuthUser(userId, username, accessToken, userSession,
         Collections.singleton(EnumSecureRole.ANONYMOUS));
   }
 
   public static AuthUser simpleUser(String userId, String username, String accessToken, String userSession, Set<EnumSecureRole> roles) {
-    return new AuthUser(userId, username, accessToken, userSession, 0, "",
+    return new AuthUser(userId, username, accessToken, userSession,
         roles);
   }
 

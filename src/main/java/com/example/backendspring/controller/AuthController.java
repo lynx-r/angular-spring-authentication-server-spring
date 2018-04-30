@@ -2,6 +2,7 @@ package com.example.backendspring.controller;
 
 import com.example.backendspring.config.AuthPath;
 import com.example.backendspring.model.Answer;
+import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.RegisterUser;
 import com.example.backendspring.service.SecureUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,27 @@ public class AuthController {
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
         .handleRequest(request, response, AuthPath.AUTHORIZE, registerUser);
+  }
+
+  @PostMapping("authenticate")
+  public @ResponseBody
+  Answer authenticate(@RequestBody AuthUser registerUser, HttpServletRequest request, HttpServletResponse response) {
+    // обрабатываем неавторизованные запрос на аутентификацию
+    return ((ModelHandlerFunc<AuthUser>) (data) ->
+        secureUserService.authenticate(data)
+            .map(Answer::ok)
+            .orElseGet(Answer::forbidden))
+        .handleRequest(request, response, AuthPath.AUTHENTICATE, registerUser);
+  }
+
+  @PostMapping("logout")
+  public @ResponseBody
+  Answer logout(@RequestBody AuthUser registerUser, HttpServletRequest request, HttpServletResponse response) {
+    // обрабатываем неавторизованные запрос на выход
+    return ((ModelHandlerFunc<AuthUser>) (data) ->
+        secureUserService.logout(data)
+            .map(Answer::ok)
+            .orElseGet(Answer::forbidden))
+        .handleRequest(request, response, AuthPath.LOGOUT, registerUser);
   }
 }

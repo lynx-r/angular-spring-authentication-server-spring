@@ -3,5 +3,7 @@ spring:
     active: dev
   mustache.check-template-location: false
 
-HEADERS: Content-Type,Content-Length,Access-Control-Allow-Origin,Content-Encoding,Vary,user-roles
+logging.level.com.example: debug
+
+HEADERS: Content-Type,Content-Length,Access-Control-Allow-Origin,Content-Encoding,Vary,user-roles,access-token,user-session
 METHODS: GET,POST,PUT,OPTIONS,HEADER,DELETE
