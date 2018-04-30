@@ -15,11 +15,14 @@
 
 # Детали
 
-# Пример самописной аутентификации для Angular и Spring
+# Пример самописной аутентификации на Angular и Spring (сервер на Spring)
 
 ## О чем эта статья
 
-В этой статье я расскажу как добавить на ваш проект аутентификацию без помощи готовых решений для данной задачи. Я предлагаю посмотреть на приложения для Angular и Spring [Репозиторий клиента для Angular](https://github.com/lynx-r/angular-spring-authentication-web-angular) [Репозиторий сервера для Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
+В этой статье я расскажу как добавить на ваш проект аутентификацию без помощи готовых решений для данной задачи. Я предлагаю посмотреть на приложения на Angular и Spring [Репозиторий клиента на Angular-ngrx-starter](https://github.com/lynx-r/angular-spring-authentication-web-angular) [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
+
+Здесь мы рассмотрим клиентскую часть на Spring.
+
 <cut/>
 
 # Сервер аутентификации на Spring
@@ -63,7 +66,7 @@
         │   ├── Payload.java                        # Интерфейс с описание классов для сериализации/десериализации в JSON
         │   ├── PingPayload.java                    # Данные, которые получаем от клиента
         │   ├── PongPayload.java                    # Данные, которые возвращаем клиенту
-        │   ├── RegisterUser.java                   # Информация для регистрации/аутентифкации пользователя
+        │   ├── RegisterUser.java                   # Информация для регистрации/аутентификации пользователя
         │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
         └── service
             ├── PingPongService.java                # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
@@ -118,7 +121,7 @@ if (clientDigest.equals(secureUser.getDigest())) {
 
 Да, для получения AccessToken’а я не использую никаких данных пользователя. Просто генерирую случайную строку и шифрую её стандартными алгоритмами шифрования javax.crypto.
 
-## Контроллер авторизации клиента (AuthController)
+#№ Контроллер авторизации клиента (AuthController)
 
 Для формирования ответа клиенту я использовал способ описанный раннее в [этой статье](https://habr.com/post/352732/)
 
@@ -139,7 +142,7 @@ Answer authorize(@RequestBody RegisterUser registerUser, HttpServletResponse res
 }
 ```
 
-Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервися склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `RegisterUser`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
+Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервиса склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `RegisterUser`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
 
 ## Контроллер обработки запросов клиента (ProtectedPingPongController)
 
@@ -154,7 +157,7 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
   return ((SecureHandlerFunc) authUser ->
       secureUserService.authenticate(authUser) // Авторизуем пользователя
   ).getAuthUser(request, SecuredAuthority.PING)
-      .map(authUser -> // получаме авторизованного пользователя
+      .map(authUser -> // получаем авторизованного пользователя
           ((TrustedHandlerFunc<PingPayload>) (data) ->
               pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
                   .map(Answer::ok)
@@ -168,12 +171,17 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
 
 Детали реализации этих интерфейсов я приводить не буду, так как они описаны в статье выше. Скажу лишь, что отличие только в разбиение полномочий на авторизацию данных пришедших в заголовках и создание ответа клиенту.
 
-## Не обошлось без Spring Security
+# Не обошлось без Spring Security
 
 Нужно отметить, что всё же пришлось обратиться за помощью к Spring Security для CORS.
 
 Для добавления соответствующих заголовков был использован и немного переработан код с StackOverflow. Он находится в классах `CorsFilterAdapter` и `SecurityConfig`.
 
-## Заключение
+# Заключение
 
 В этой статье мы рассмотрели как сделать простую аутентификацию "своими руками".
+
+# Ссылки
+
+* [Spring](http://spring.io/)
+* [Создание простого RESTful API с Spark Framework](https://habr.com/post/352732/)
