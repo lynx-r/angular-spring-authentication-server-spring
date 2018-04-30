@@ -1,6 +1,7 @@
 package com.example.backendspring.controller;
 
 import com.example.backendspring.config.AuthAuthority;
+import com.example.backendspring.function.ModelHandlerFunc;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.RegisterUser;

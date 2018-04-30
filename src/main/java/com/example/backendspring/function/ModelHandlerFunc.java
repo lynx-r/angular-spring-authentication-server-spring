@@ -1,4 +1,4 @@
-package com.example.backendspring.controller;
+package com.example.backendspring.function;
 
 
 import com.example.backendspring.config.IAuthority;
