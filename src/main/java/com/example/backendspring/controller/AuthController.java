@@ -35,7 +35,7 @@ public class AuthController {
         secureUserService.register(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleProtectedRequest(response, registerUser);
+        .handleAuthRequest(response, registerUser);
   }
 
   @PostMapping("authorize")
@@ -46,7 +46,7 @@ public class AuthController {
         secureUserService.authorize(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleProtectedRequest(response, registerUser);
+        .handleAuthRequest(response, registerUser);
   }
 
   @PostMapping("authenticate")
@@ -57,7 +57,7 @@ public class AuthController {
         secureUserService.authenticate(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleProtectedRequest(response, registerUser);
+        .handleAuthRequest(response, registerUser);
   }
 
   @PostMapping("logout")
@@ -72,7 +72,7 @@ public class AuthController {
                 secureUserService.logout(data)
                     .map(Answer::ok)
                     .orElseGet(Answer::forbidden)
-            ).handleProtectedRequest(response, authUser) // обрабатываем запрос
+            ).handleAuthRequest(response, authUser) // обрабатываем запрос
         ).orElseGet(Answer::forbidden);
   }
 }

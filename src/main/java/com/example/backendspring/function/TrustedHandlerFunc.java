@@ -15,16 +15,17 @@ public interface TrustedHandlerFunc<T extends Payload> extends BaseHandlerFunc<T
 
   default Answer handleRequest(HttpServletResponse response, T data, AuthUser token) {
     Answer answer = getAnswer(response, data);
-    if (token != null) {
-      answer.setAuthUser(token);
-    } else {
-      answer.setAuthUser((AuthUser) answer.getBody());
-    }
+    // Подписываем ответ токеном. Токен должен быть действительным
+    answer.setAuthUser(token);
     response.setStatus(answer.getStatusCode());
     return answer;
   }
 
-  default Answer handleProtectedRequest(HttpServletResponse response, T data) {
-    return handleRequest(response, data, null);
+  default Answer handleAuthRequest(HttpServletResponse response, T data) {
+    Answer answer = getAnswer(response, data);
+    // Ответ является токеном
+    answer.setAuthUser((AuthUser) answer.getBody());
+    response.setStatus(answer.getStatusCode());
+    return answer;
   }
 }
