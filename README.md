@@ -15,14 +15,16 @@
 
 # Детали
 
-# Пример аутентификации без фреймворков для аутентификации на Angular и Spring
+# Пример самописной аутентификации для Angular и Spring
 
-## Что вы изучите
+## О чем эта статья
 
-Вы изучите как создать сайт с собственной аутентификации без использования сторонних библиотек и фреймворков для аутентификации. Здесь будут рассмотрены приложения на Angular и Spring [Репозиторий клиента на Angular](https://github.com/lynx-r/angular-spring-authentication-web-angular) [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
+В этой статье я расскажу как добавить на ваш проект аутентификацию без помощи готовых решений для данной задачи. Я предлагаю посмотреть на приложения для Angular и Spring [Репозиторий клиента для Angular](https://github.com/lynx-r/angular-spring-authentication-web-angular) [Репозиторий сервера для Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
 <cut/>
 
 # Сервер аутентификации на Spring
+
+Начнём с основного? Пожалуй, да. Посмотрим на структуру проекта сервера.
 
 ## Структура проекта
 
@@ -65,22 +67,24 @@
         │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
         └── service
             ├── PingPongService.java                # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
-            ├── SecureUserService.java              # Собственно, сервис в котором производится аутентификация/авторизация
+            ├── SecureUserService.java              # ***Собственно, сервис в котором производится аутентификация/авторизация***
             └── SecureUtils.java                    # Сервис для шифрования данных пользователя
     
     8 directories, 32 files
 
-## SecureUserService.java
+## Сервис аутентификации/авторизации/регистрации и иже с ними (SecureUserService)
 
-Это основной сервис этой статьи. В нем реализованы следующие методы:
+`SecureUserService` главный сервис данной статьи - то, ради чего она задумывалась. Эксперимент по въезжанию в смысл такой простой и в тоже время насущной для новичка темы. 
 
-`public Optional<AuthUser> register(RegisterUser registerUser);` - Регистрация пользователя;
+В нем реализованы следующие методы:
 
-`public Optional<AuthUser> authorize(RegisterUser registerUser);` - Авторизация/Логин пользователя;
+`public Optional<AuthUser> register(RegisterUser registerUser)` - Регистрация пользователя;
 
-`public Optional<AuthUser> authenticate(AuthUser authUser);` - Аутентификация/Проверка прав пользователя;
+`public Optional<AuthUser> authorize(RegisterUser registerUser)` - Авторизация или Логин пользователя;
 
-`public Optional<AuthUser> logout(AuthUser authUser);` - Выход/Удаление информации о том, что пользователь сейчас на сайте.
+`public Optional<AuthUser> authenticate(AuthUser authUser)` - Аутентификация  или Проверка прав пользователя;
+
+`public Optional<AuthUser> logout(AuthUser authUser)` - Выход или Удаление информации о том, что пользователь сейчас на сайте.
 
 Приведу код авторизации пользователя:
 
@@ -92,7 +96,7 @@ String clientDigest = SecureUtils.digest(credentials + salt);
 
 // Сверяем с теми что хранятся в базе данных
 if (clientDigest.equals(secureUser.getDigest())) {
-  // Получаем зашифрованный AccessToken
+  // Получаем зашифрованный AccessToken и сохраняем ключи шифрования в SecureUser
   TokenPair accessToken = getAccessToken(secureUser);
   
   // Присваиваем пользователю сессию
@@ -103,43 +107,43 @@ if (clientDigest.equals(secureUser.getDigest())) {
   secureUser.setUserSession(userSession);
   secureUserDao.save(secureUser);
 
-  // Возвращем AccessToken, открытые данные пользователя и сессию клиенту
+  // Возвращем AccessToken, сессию и открытые данные пользователя клиенту
   String userId = secureUser.getId();
   Set<EnumAuthority> authorities = secureUser.getAuthorities();
   AuthUser authUser = AuthUser.simpleUser(userId, username, accessToken.accessToken, userSession, authorities);
   return authUser;
 ```
 
-В общем, стандартный алгоритм, которые применяется довольно давно.
+В общем, стандартный алгоритм, которые применяется еще с 90-х.
 
-Да, для получения AccessToken’а я не использую ничего из данных пользователя. Просто беру рандомную строку и шифрую её встроенными алгоритмами шифрования Java.
+Да, для получения AccessToken’а я не использую никаких данных пользователя. Просто генерирую случайную строку и шифрую её стандартными алгоритмами шифрования javax.crypto.
 
 ## Контроллер авторизации клиента (AuthController)
 
 Для формирования ответа клиенту я использовал способ описанный раннее в [этой статье](https://habr.com/post/352732/)
 
-В этом примере были произведены некоторые упрощения. Но, здесь, все так же используется функциональные интерфейсы:
+В этом примере я сделал некоторые упрощения. Но, здесь, все так же используется функциональные интерфейсы из `Java SE 8`:
 
-Приведу пример того, как выглядит создание ответа при авторизации:
+Приведу пример того, как я отвечаю клиенту после его авторизации на сайте:
 
 ```
-@PostMapping("authenticate")
+@PostMapping("authorize")
 public @ResponseBody
-Answer authenticate(@RequestBody AuthUser registerUser, HttpServletResponse response) {
-  // обрабатываем не авторизованные запрос на аутентификацию
-  return ((TrustedHandlerFunc<AuthUser>) (data) ->
-      secureUserService.authenticate(data)
+Answer authorize(@RequestBody RegisterUser registerUser, HttpServletResponse response) {
+  // обрабатываем не авторизованные запрос на авторизацию
+  return ((TrustedHandlerFunc<RegisterUser>) (data) ->
+      secureUserService.authorize(data)
           .map(Answer::ok)
           .orElseGet(Answer::forbidden))
       .handleAuthRequest(response, registerUser);
 }
 ```
 
-Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data);`. Этот метод реализуется в контроллере и в нём выполняется вызов описанного выше сервиса `SecureUserService`. Ответ этого сервися отображается на метод `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Оба метода формируют соответствующие тела ответа. В первом случае телом ответа будет результат выполнения метода сервиса `SecureUserService::authorize` - `AuthUser`. Во втором, случае будет сообщение `MessageResponse`. Также в данном интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data);` данные. При этом, первый метод предполагает наличие проверенного токена, а второй используется для авторизации.
+Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервися склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `RegisterUser`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
 
 ## Контроллер обработки запросов клиента (ProtectedPingPongController)
 
-Этот контроллер, как вы привыкли видеть, обрабатывает запросы пользователя через сервис `PingPongService`.
+И, наконец, вы дочитали до того, для чего это всё писалось. Но, я не о том, что было сказано выше (эксперимент), а о том, что имеется ввиду в контексте данного примера (сайт). А писалось всё это для запертого контроллера, как вы привыкли видеть, который обрабатывает запросы пользователя через какой-то сервис, например, `PingPongService`.
 
 Приведу пример создания ответа на запрос `ping`:
 
@@ -155,21 +159,21 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
               pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
                   .map(Answer::ok)
                   .orElseGet(Answer::forbidden)
-          ).handleRequest(response, ping, authUser) // обрабатываем запрос
+          ).handleRequest(response, ping, authUser) // обрабатываем запрос в интерфейсе
       ).orElseGet(Answer::forbidden);
 }
 ```
 
-Здесь используются два функциональных интерфейса: `SecureHandlerFunc` и `TrustedHandlerFunc`. Первый проверяет пользовательские заголовки, пришедшие с клиента, создает из них "token" AuthUser и передаёт их в следующую функцию `TrustedHandlerFunc`. В ней ожидается, что её вызывает авторизованный пользователь.
+Здесь используются два функциональных интерфейса: `SecureHandlerFunc` и `TrustedHandlerFunc`. Первый проверяет пользовательские заголовки, пришедшие с клиента, создает из них "token" `AuthUser` и передаёт их в следующий метод интерфейса  `TrustedHandlerFunc`. Здесь ожидается, что "токен" - авторизованный пользователь.
 
-Детали реализации этих интерфейсов я приводить не буду, так как они описаны в статье, ссылка на которую, была приведена ранее. Скажу лишь, что отличие только в разбиение полномочий на авторизацию и создание ответа клиенту.
+Детали реализации этих интерфейсов я приводить не буду, так как они описаны в статье выше. Скажу лишь, что отличие только в разбиение полномочий на авторизацию данных пришедших в заголовках и создание ответа клиенту.
 
 ## Не обошлось без Spring Security
 
-Нужно отметить, что всё же пришлось обратиться к помощи Spring Security для корректной обработки CORS.
+Нужно отметить, что всё же пришлось обратиться за помощью к Spring Security для CORS.
 
-Для добавления соответствующих заголовков был использован код с StackOverflow. Он находится в классах `CorsFilterAdapter` и `SecurityConfig`.
+Для добавления соответствующих заголовков был использован и немного переработан код с StackOverflow. Он находится в классах `CorsFilterAdapter` и `SecurityConfig`.
 
-## Вывод
+## Заключение
 
-В этой статье мы рассмотрели как сделать простую аутентификацию "своими руками" почти без использования специализированных фреймворков.
+В этой статье мы рассмотрели как сделать простую аутентификацию "своими руками".
