@@ -20,14 +20,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class AuthControllerTest extends WebTest {
 
-  private final static String REST_URL = "/security";
+  public final static String SECURITY_REST_URL = "/security";
 
   @Test
   public void empty_credentials_register() throws Exception {
     UserCredentials userCredentials = new UserCredentials();
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -40,7 +40,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -53,7 +53,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -62,7 +62,7 @@ public class AuthControllerTest extends WebTest {
 
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -75,7 +75,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -88,7 +88,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -98,7 +98,7 @@ public class AuthControllerTest extends WebTest {
 
     mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -111,7 +111,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -121,7 +121,7 @@ public class AuthControllerTest extends WebTest {
 
     MvcResult authorizeResponse = mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -134,7 +134,7 @@ public class AuthControllerTest extends WebTest {
     AuthUser authUser = answerAuthorize.getAuthUser();
     mockMvc
         .perform(
-            get(REST_URL + "/logout")
+            get(SECURITY_REST_URL + "/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
                 .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
@@ -144,7 +144,7 @@ public class AuthControllerTest extends WebTest {
 
     mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -158,7 +158,7 @@ public class AuthControllerTest extends WebTest {
     AuthUser anonymous = AuthUser.anonymous();
     mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(anonymous))
         )
@@ -171,7 +171,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     MvcResult registerResult = mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -183,7 +183,7 @@ public class AuthControllerTest extends WebTest {
     Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -196,7 +196,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -206,7 +206,7 @@ public class AuthControllerTest extends WebTest {
 
     MvcResult authorizeResult = mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -218,7 +218,7 @@ public class AuthControllerTest extends WebTest {
     Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -231,7 +231,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -241,7 +241,7 @@ public class AuthControllerTest extends WebTest {
 
     MvcResult authorizeResult = mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -253,7 +253,7 @@ public class AuthControllerTest extends WebTest {
     Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     MvcResult authenticateResult = mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -266,7 +266,7 @@ public class AuthControllerTest extends WebTest {
     AuthUser authUser = answerAuthorize.getAuthUser();
     mockMvc
         .perform(
-            get(REST_URL + "/logout")
+            get(SECURITY_REST_URL + "/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
                 .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
@@ -278,7 +278,7 @@ public class AuthControllerTest extends WebTest {
     answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -292,7 +292,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     MvcResult registerResult = mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -304,7 +304,7 @@ public class AuthControllerTest extends WebTest {
     Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     MvcResult authenticateResult = mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -316,7 +316,7 @@ public class AuthControllerTest extends WebTest {
     answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -329,7 +329,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -339,7 +339,7 @@ public class AuthControllerTest extends WebTest {
 
     MvcResult authorizeResult = mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -351,7 +351,7 @@ public class AuthControllerTest extends WebTest {
     Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     MvcResult authenticateResult = mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -364,7 +364,7 @@ public class AuthControllerTest extends WebTest {
     AuthUser authUser = answerAuthorize.getAuthUser();
     mockMvc
         .perform(
-            get(REST_URL + "/logout")
+            get(SECURITY_REST_URL + "/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
                 .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
@@ -378,7 +378,7 @@ public class AuthControllerTest extends WebTest {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
         .perform(
-            post(REST_URL + "/register")
+            post(SECURITY_REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -388,7 +388,7 @@ public class AuthControllerTest extends WebTest {
 
     MvcResult authorizeResult = mockMvc
         .perform(
-            post(REST_URL + "/authorize")
+            post(SECURITY_REST_URL + "/authorize")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(userCredentials))
         )
@@ -400,7 +400,7 @@ public class AuthControllerTest extends WebTest {
     Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
     MvcResult authenticateResult = mockMvc
         .perform(
-            post(REST_URL + "/authenticate")
+            post(SECURITY_REST_URL + "/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
         )
@@ -413,7 +413,7 @@ public class AuthControllerTest extends WebTest {
     AuthUser authUser = answerAuthorize.getAuthUser();
     mockMvc
         .perform(
-            get(REST_URL + "/logout")
+            get(SECURITY_REST_URL + "/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
                 .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
@@ -426,7 +426,7 @@ public class AuthControllerTest extends WebTest {
     authUser = answerAuthorize.getAuthUser();
     mockMvc
         .perform(
-            get(REST_URL + "/logout")
+            get(SECURITY_REST_URL + "/logout")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
                 .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())

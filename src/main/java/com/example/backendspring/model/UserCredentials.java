@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UserCredentials implements Payload {
+public class UserCredentials implements Payload, DeepClone {
 
   @NotNull(message = "Не допустимо пустое значение")
   @Size(min = 4, message = "Минимальная длина 4 символа")
