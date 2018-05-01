@@ -1,17 +1,18 @@
 package com.example.backendspring.controller;
 
 import com.example.backendspring.config.SecuredAuthority;
-import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.function.SecureHandlerFunc;
+import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
-import com.example.backendspring.model.RegisterUser;
+import com.example.backendspring.model.UserCredentials;
 import com.example.backendspring.service.SecureUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 /**
  * Created by Aleksey Popryadukhin on 29/04/2018.
@@ -29,50 +30,51 @@ public class AuthController {
 
   @PostMapping("register")
   public @ResponseBody
-  Answer register(@RequestBody RegisterUser registerUser, HttpServletResponse response) {
+  Answer register(@Valid @RequestBody UserCredentials userCredentials, HttpServletResponse response) {
     // обрабатываем не авторизованные запрос на регистрацию
-    return ((TrustedHandlerFunc<RegisterUser>) (data) ->
+    return ((TrustedHandlerFunc<UserCredentials>) (data) ->
         secureUserService.register(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleAuthRequest(response, registerUser);
+        .handleAuthRequest(response, userCredentials);
   }
 
   @PostMapping("authorize")
   public @ResponseBody
-  Answer authorize(@RequestBody RegisterUser registerUser, HttpServletResponse response) {
+  Answer authorize(@Valid @RequestBody UserCredentials userCredentials, HttpServletResponse response) {
     // обрабатываем не авторизованные запрос на авторизацию
-    return ((TrustedHandlerFunc<RegisterUser>) (data) ->
+    return ((TrustedHandlerFunc<UserCredentials>) (data) ->
         secureUserService.authorize(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleAuthRequest(response, registerUser);
+        .handleAuthRequest(response, userCredentials);
   }
 
   @PostMapping("authenticate")
   public @ResponseBody
-  Answer authenticate(@RequestBody AuthUser registerUser, HttpServletResponse response) {
+  Answer authenticate(@RequestBody AuthUser authUser, HttpServletResponse response) {
     // обрабатываем не авторизованные запрос на аутентификацию
     return ((TrustedHandlerFunc<AuthUser>) (data) ->
         secureUserService.authenticate(data)
             .map(Answer::ok)
             .orElseGet(Answer::forbidden))
-        .handleAuthRequest(response, registerUser);
+        .handleAuthRequest(response, authUser);
   }
 
-  @PostMapping("logout")
+  @GetMapping("logout")
   public @ResponseBody
-  Answer logout(@RequestBody AuthUser logoutUser, HttpServletRequest request, HttpServletResponse response) {
+  Answer logout(HttpServletRequest request, HttpServletResponse response) {
     // обрабатываем авторизованные запрос на выход
     return ((SecureHandlerFunc) authUser ->
         secureUserService.authenticate(authUser) // Авторизуем пользователя
     ).getAuthUser(request, SecuredAuthority.PING)
-        .map(authUser -> // получаме авторизованного пользователя
+        .map(authUser -> // получаем авторизованного пользователя
             ((TrustedHandlerFunc<AuthUser>) (data) ->
                 secureUserService.logout(data)
                     .map(Answer::ok)
                     .orElseGet(Answer::forbidden)
             ).handleAuthRequest(response, authUser) // обрабатываем запрос
-        ).orElseGet(Answer::forbidden);
+        )
+        .orElseGet(Answer::forbidden);
   }
 }

@@ -5,9 +5,8 @@ package com.example.backendspring.config;
  */
 public class RequestConstants {
   public static final int SESSION_LENGTH = 20;
-  public static final int COOKIE_AGE = 31 * 24 * 60 * 60;
+  public static final int HTTP_ONLY_AUTH_COOKIE_AGE = 31 * 24 * 60 * 60;
   public static final String ANONYMOUS_SESSION_HEADER = "anonymous-session";
   public static final String USER_SESSION_HEADER = "user-session";
-  public static final String USER_AUTHORITIES_HEADER = "user-authorities";
   public static final String ACCESS_TOKEN_HEADER = "access-token";
 }

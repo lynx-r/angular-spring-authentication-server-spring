@@ -66,7 +66,7 @@
         │   ├── Payload.java                        # Интерфейс с описание классов для сериализации/десериализации в JSON
         │   ├── PingPayload.java                    # Данные, которые получаем от клиента
         │   ├── PongPayload.java                    # Данные, которые возвращаем клиенту
-        │   ├── RegisterUser.java                   # Информация для регистрации/аутентификации пользователя
+        │   ├── Usercredentials.java                   # Информация для регистрации/аутентификации пользователя
         │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
         └── service
             ├── PingPongService.java                # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
@@ -81,9 +81,9 @@
 
 В нем реализованы следующие методы:
 
-`public Optional<AuthUser> register(RegisterUser registerUser)` - Регистрация пользователя;
+`public Optional<AuthUser> register(Usercredentials usercredentials)` - Регистрация пользователя;
 
-`public Optional<AuthUser> authorize(RegisterUser registerUser)` - Авторизация или Логин пользователя;
+`public Optional<AuthUser> authorize(Usercredentials usercredentials)` - Авторизация или Логин пользователя;
 
 `public Optional<AuthUser> authenticate(AuthUser authUser)` - Аутентификация  или Проверка прав пользователя;
 
@@ -93,7 +93,7 @@
 
 ```
 // Берем хеш учетных данных пользователя
-String credentials = registerUser.getCredentials();
+String credentials = usercredentials.getCredentials();
 String salt = secureUser.getSalt();
 String clientDigest = SecureUtils.digest(credentials + salt);
 
@@ -132,17 +132,17 @@ if (clientDigest.equals(secureUser.getDigest())) {
 ```
 @PostMapping("authorize")
 public @ResponseBody
-Answer authorize(@RequestBody RegisterUser registerUser, HttpServletResponse response) {
+Answer authorize(@RequestBody Usercredentials usercredentials, HttpServletResponse response) {
   // обрабатываем не авторизованные запрос на авторизацию
-  return ((TrustedHandlerFunc<RegisterUser>) (data) ->
+  return ((TrustedHandlerFunc<Usercredentials>) (data) ->
       secureUserService.authorize(data)
           .map(Answer::ok)
           .orElseGet(Answer::forbidden))
-      .handleAuthRequest(response, registerUser);
+      .handleAuthRequest(response, usercredentials);
 }
 ```
 
-Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервиса склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `RegisterUser`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
+Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервиса склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `Usercredentials`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
 
 ## Контроллер обработки запросов клиента (ProtectedPingPongController)
 

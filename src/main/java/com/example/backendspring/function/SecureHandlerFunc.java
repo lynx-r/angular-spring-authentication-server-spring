@@ -1,6 +1,7 @@
 package com.example.backendspring.function;
 
 import com.example.backendspring.config.IAuthority;
+import com.example.backendspring.exception.AuthException;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumAuthority;
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.example.backendspring.config.RequestConstants.*;
-import static com.example.backendspring.service.SecureUtils.getCookieValue;
+import static com.example.backendspring.service.Utils.getCookieValue;
 
 /**
  * Created by Aleksey Popryaduhin on 16:37 01/10/2017.
@@ -23,29 +24,30 @@ public interface SecureHandlerFunc {
   default Optional<AuthUser> getAuthUser(HttpServletRequest request, IAuthority authority) {
     AuthUser clientAuthUser = getClientAuthUser(request);
     return
-        isAuthenticated(clientAuthUser)
-            .map(authUser -> {
-              if (!hasRights(authUser.getAuthorities(), authority)) {
-                return null;
-              }
-              return authUser;
-            });
+        Optional.of(
+            isAuthenticated(clientAuthUser)
+                .map(authUser -> {
+                  if (!hasRights(authUser.getAuthorities(), authority.getAuthorities())) {
+                    return null;
+                  }
+                  return authUser;
+                })
+                .orElseThrow(AuthException::forbidden)
+        );
   }
 
-  default boolean hasRights(Set<EnumAuthority> authorities, IAuthority authority) {
-    return authority.getAuthorities().isEmpty() || EnumAuthority.hasAuthority(authorities, authority.getAuthorities());
+  default boolean hasRights(Set<EnumAuthority> clientAuthorities, Set<EnumAuthority> allowedAuthorities) {
+    return allowedAuthorities.isEmpty() || EnumAuthority.hasAuthority(clientAuthorities, allowedAuthorities);
   }
 
   default AuthUser getClientAuthUser(HttpServletRequest request) {
     String userSession = getOrCreateSession(request);
     String accessToken = request.getHeader(ACCESS_TOKEN_HEADER);
-    String authorities = request.getHeader(USER_AUTHORITIES_HEADER);
 
     if (StringUtils.isBlank(accessToken) || StringUtils.isBlank(userSession)) {
       return new AuthUser(userSession).setAuthority(EnumAuthority.ANONYMOUS);
     }
-    return new AuthUser(accessToken, userSession)
-        .setAuthorities(EnumAuthority.parseAuthorities(authorities));
+    return new AuthUser(accessToken, userSession);
   }
 
   default String getOrCreateSession(HttpServletRequest request) {

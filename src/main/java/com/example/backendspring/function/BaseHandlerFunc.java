@@ -6,7 +6,7 @@ import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumAuthority;
 import com.example.backendspring.model.Payload;
-import com.example.backendspring.service.SecureUtils;
+import com.example.backendspring.service.Utils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -43,9 +43,9 @@ public interface BaseHandlerFunc<T extends Payload> {
    * @return generate session and set cookie
    */
   default String putSessionAndSetCookieInResponse(HttpServletResponse response) {
-    String anonymousSession = SecureUtils.getRandomString(SESSION_LENGTH);
+    String anonymousSession = Utils.getRandomString(SESSION_LENGTH);
     Cookie cookie = new Cookie(ANONYMOUS_SESSION_HEADER, anonymousSession);
-    cookie.setMaxAge(COOKIE_AGE);
+    cookie.setMaxAge(HTTP_ONLY_AUTH_COOKIE_AGE);
     cookie.setHttpOnly(true);
     response.addCookie(cookie);
     return anonymousSession;

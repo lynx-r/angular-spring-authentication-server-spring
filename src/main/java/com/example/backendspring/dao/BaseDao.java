@@ -23,7 +23,12 @@ public class BaseDao<T extends BaseDomain> {
       logger.error("Entity is null");
       return;
     }
-    db.put(entity.getId(), entity);
+    if (db.containsKey(entity.getId())) {
+      T oldEntity = db.get(entity.getId());
+      db.replace(entity.getId(), oldEntity, entity);
+    } else {
+      db.put(entity.getId(), entity);
+    }
   }
 
   public List<T> findAll(Integer limit) {

@@ -1,5 +1,6 @@
 package com.example.backendspring.dao;
 
+import com.example.backendspring.model.DeepClone;
 import com.example.backendspring.model.SecureUser;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class SecureUserDao extends BaseDao<SecureUser> {
   }
 
   private Optional<SecureUser> findByAttributeIndex(String attribute, String attributeName) {
-    return db.values()
+    Optional<SecureUser> secureUserOptional = db.values()
         .stream()
         .filter((sUser) -> {
           try {
@@ -38,5 +39,7 @@ public class SecureUserDao extends BaseDao<SecureUser> {
           return false;
         })
         .findFirst();
+    return secureUserOptional
+        .map(DeepClone::deepClone);
   }
 }
