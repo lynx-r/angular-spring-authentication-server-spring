@@ -49,6 +49,28 @@ public class AuthControllerTest extends WebTest {
   }
 
   @Test
+  public void register_twice_with_same_credentials() throws Exception {
+    UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
+    mockMvc
+        .perform(
+            post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(
+            post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
   public void authorize_not_registered() throws Exception {
     UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
     mockMvc
@@ -82,6 +104,53 @@ public class AuthControllerTest extends WebTest {
         )
         .andDo(print())
         .andExpect(status().isOk());
+  }
+
+  @Test
+  public void authorize_after_logout() throws Exception {
+    UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
+    mockMvc
+        .perform(
+            post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andReturn();
+
+    MvcResult authorizeResponse = mockMvc
+        .perform(
+            post(REST_URL + "/authorize")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andReturn();
+
+    String answerAsString = authorizeResponse.getResponse().getContentAsString();
+    Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
+    AuthUser authUser = answerAuthorize.getAuthUser();
+    mockMvc
+        .perform(
+            get(REST_URL + "/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
+                .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(
+            post(REST_URL + "/authorize")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andReturn();
   }
 
   @Test
@@ -155,6 +224,67 @@ public class AuthControllerTest extends WebTest {
         )
         .andDo(print())
         .andExpect(status().isOk());
+  }
+
+  @Test
+  public void authenticate_after_logout() throws Exception {
+    UserCredentials userCredentials = new UserCredentials(getRandomString20(), getRandomString20());
+    mockMvc
+        .perform(
+            post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andReturn();
+
+    MvcResult authorizeResult = mockMvc
+        .perform(
+            post(REST_URL + "/authorize")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(userCredentials))
+        )
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andReturn();
+
+    String answerAsString = authorizeResult.getResponse().getContentAsString();
+    Answer answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
+    MvcResult authenticateResult = mockMvc
+        .perform(
+            post(REST_URL + "/authenticate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
+        )
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andReturn();
+
+    answerAsString = authenticateResult.getResponse().getContentAsString();
+    answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
+    AuthUser authUser = answerAuthorize.getAuthUser();
+    mockMvc
+        .perform(
+            get(REST_URL + "/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
+                .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
+        )
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    answerAsString = authorizeResult.getResponse().getContentAsString();
+    answerAuthorize = JsonUtil.readValue(answerAsString, Answer.class);
+    mockMvc
+        .perform(
+            post(REST_URL + "/authenticate")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(answerAuthorize.getAuthUser()))
+        )
+        .andDo(print())
+        .andExpect(status().isForbidden())
+        .andReturn();
   }
 
   @Test
@@ -235,9 +365,9 @@ public class AuthControllerTest extends WebTest {
     mockMvc
         .perform(
             get(REST_URL + "/logout")
-            .contentType(MediaType.APPLICATION_JSON)
-            .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
-            .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
+                .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
         )
         .andDo(print())
         .andExpect(status().isOk());
@@ -284,9 +414,9 @@ public class AuthControllerTest extends WebTest {
     mockMvc
         .perform(
             get(REST_URL + "/logout")
-            .contentType(MediaType.APPLICATION_JSON)
-            .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
-            .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
+                .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
         )
         .andDo(print())
         .andExpect(status().isOk());
@@ -297,9 +427,9 @@ public class AuthControllerTest extends WebTest {
     mockMvc
         .perform(
             get(REST_URL + "/logout")
-            .contentType(MediaType.APPLICATION_JSON)
-            .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
-            .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(RequestConstants.ACCESS_TOKEN_HEADER, authUser.getAccessToken())
+                .header(RequestConstants.USER_SESSION_HEADER, authUser.getUserSession())
         )
         .andDo(print())
         .andExpect(status().isForbidden());
