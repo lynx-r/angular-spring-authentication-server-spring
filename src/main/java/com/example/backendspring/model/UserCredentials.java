@@ -12,17 +12,17 @@ import javax.validation.constraints.Size;
 /**
  * Created by Aleksey Popryadukhin on 16/04/2018.
  */
-@JsonTypeName("Usercredentials")
+@JsonTypeName("UserCredentials")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class UserCredentials implements Payload, DeepClone {
 
-  @NotNull(message = "Не допустимо пустое значение")
-  @Size(min = 4, message = "Минимальная длина 4 символа")
+  @NotNull(message = "Не допустимо пустое значение имени пользователя")
+  @Size(min = 3, message = "Минимальная длина имени пользователя 3 символа")
   private String username;
-  @NotNull(message = "Не допустимо пустое значение")
-  @Size(min = 8, message = "Минимальная длина 4 символа")
+  @NotNull(message = "Не допустимо пустое значение пароля")
+  @Size(min = 3, message = "Минимальная длина пароля 3 символов")
   private String password;
 
   @JsonIgnore

@@ -66,7 +66,7 @@
         │   ├── Payload.java                        # Интерфейс с описание классов для сериализации/десериализации в JSON
         │   ├── PingPayload.java                    # Данные, которые получаем от клиента
         │   ├── PongPayload.java                    # Данные, которые возвращаем клиенту
-        │   ├── Usercredentials.java                   # Информация для регистрации/аутентификации пользователя
+        │   ├── UserCredentials.java                   # Информация для регистрации/аутентификации пользователя
         │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
         └── service
             ├── PingPongService.java                # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
@@ -81,9 +81,9 @@
 
 В нем реализованы следующие методы:
 
-`public Optional<AuthUser> register(Usercredentials usercredentials)` - Регистрация пользователя;
+`public Optional<AuthUser> register(UserCredentials usercredentials)` - Регистрация пользователя;
 
-`public Optional<AuthUser> authorize(Usercredentials usercredentials)` - Авторизация или Логин пользователя;
+`public Optional<AuthUser> authorize(UserCredentials usercredentials)` - Авторизация или Логин пользователя;
 
 `public Optional<AuthUser> authenticate(AuthUser authUser)` - Аутентификация  или Проверка прав пользователя;
 
@@ -117,7 +117,7 @@ if (clientDigest.equals(secureUser.getDigest())) {
   return authUser;
 ```
 
-В общем, стандартный алгоритм, которые применяется еще с 90-х.
+В общем, стандартный алгоритм.
 
 Да, для получения AccessToken’а я не использую никаких данных пользователя. Просто генерирую случайную строку и шифрую её стандартными алгоритмами шифрования javax.crypto.
 
@@ -132,9 +132,9 @@ if (clientDigest.equals(secureUser.getDigest())) {
 ```
 @PostMapping("authorize")
 public @ResponseBody
-Answer authorize(@RequestBody Usercredentials usercredentials, HttpServletResponse response) {
+Answer authorize(@RequestBody UserCredentials usercredentials, HttpServletResponse response) {
   // обрабатываем не авторизованные запрос на авторизацию
-  return ((TrustedHandlerFunc<Usercredentials>) (data) ->
+  return ((TrustedHandlerFunc<UserCredentials>) (data) ->
       secureUserService.authorize(data)
           .map(Answer::ok)
           .orElseGet(Answer::forbidden))
@@ -142,7 +142,7 @@ Answer authorize(@RequestBody Usercredentials usercredentials, HttpServletRespon
 }
 ```
 
-Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервиса склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `Usercredentials`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
+Для обработки не авторизованных запросов я использую функциональный интерфейс `TrustedHandlerFunc`. Он содержит в себе метод `Answer process(T data)`. Этот метод реализуется в контроллере и в нём выполняется вызов метода `authorize` сервиса `SecureUserService`. Ответ этого сервиса склеивается с методом `Answer::ok` в случае успешной авторизации или метод `Answer::forbidden` в случае неудачной авторизации. Также, в интерфейсе есть метод по умолчанию `TrustedHandlerFunc::handleRequest` и `TrustedHandlerFunc::handleAuthRequest`, который выбирают для метода `Answer process(T data)` данные. Здесь это `UserCredentials`. Нужно уточнить, что первый метод `handleRequest` предполагает наличие проверенного токена `AuthUser`, а второй, `handleAuthRequest`, нужен только для контроллера `AuthController`.
 
 ## Контроллер обработки запросов клиента (ProtectedPingPongController)
 

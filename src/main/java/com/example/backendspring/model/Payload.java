@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = PongPayload.class, name = "PongPayload"),
     @JsonSubTypes.Type(value = PingPayload.class, name = "PingPayload"),
 
-    @JsonSubTypes.Type(value = UserCredentials.class, name = "Usercredentials"),
+    @JsonSubTypes.Type(value = UserCredentials.class, name = "UserCredentials"),
     @JsonSubTypes.Type(value = AuthUser.class, name = "AuthUser"),
 })
 public interface Payload {

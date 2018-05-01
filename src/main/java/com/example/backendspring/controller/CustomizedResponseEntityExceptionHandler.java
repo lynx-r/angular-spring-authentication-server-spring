@@ -2,6 +2,7 @@ package com.example.backendspring.controller;
 
 import com.example.backendspring.exception.AuthException;
 import com.example.backendspring.model.MessageResponse;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static java.net.HttpURLConnection.*;
+import java.util.stream.Collectors;
+
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 
 /**
  * Код взят отсюда http://www.springboottutorial.com/spring-boot-validation-for-rest-services
@@ -36,7 +40,11 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                 HttpHeaders headers, HttpStatus status, WebRequest request) {
-    MessageResponse errorDetails = new MessageResponse(HTTP_BAD_REQUEST, ex.getBindingResult().toString());
+    String errors = ex.getBindingResult().getAllErrors()
+        .stream()
+        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+        .collect(Collectors.joining(";"));
+    MessageResponse errorDetails = new MessageResponse(HTTP_BAD_REQUEST, errors);
     return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
   }
 }

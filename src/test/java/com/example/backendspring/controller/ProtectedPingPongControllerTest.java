@@ -79,7 +79,6 @@ public class ProtectedPingPongControllerTest extends WebTest {
         .andDo(print())
         .andExpect(status().isOk())
         .andReturn();
-    Answer answerPing = JsonUtil.readValue(pingResponse.getResponse().getContentAsString(), Answer.class);
 
     answerAsString = pingResponse.getResponse().getContentAsString();
     answer = JsonUtil.readValue(answerAsString, Answer.class);
