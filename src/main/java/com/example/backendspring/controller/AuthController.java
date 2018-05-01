@@ -1,6 +1,6 @@
 package com.example.backendspring.controller;
 
-import com.example.backendspring.config.SecuredAuthority;
+import com.example.backendspring.config.DefendedAuthority;
 import com.example.backendspring.function.SecureHandlerFunc;
 import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.model.Answer;
@@ -67,7 +67,7 @@ public class AuthController {
     // обрабатываем авторизованные запрос на выход
     return ((SecureHandlerFunc) authUser ->
         secureUserService.authenticate(authUser) // Авторизуем пользователя
-    ).getAuthUser(request, SecuredAuthority.PING)
+    ).getAuthUser(request, DefendedAuthority.PING)
         .map(authUser -> // получаем авторизованного пользователя
             ((TrustedHandlerFunc<AuthUser>) (data) ->
                 secureUserService.logout(data)

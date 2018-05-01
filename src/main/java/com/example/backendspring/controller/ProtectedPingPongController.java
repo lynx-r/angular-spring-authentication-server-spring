@@ -1,6 +1,6 @@
 package com.example.backendspring.controller;
 
-import com.example.backendspring.config.SecuredAuthority;
+import com.example.backendspring.config.DefendedAuthority;
 import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.function.SecureHandlerFunc;
 import com.example.backendspring.model.Answer;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * Created by Aleksey Popryadukhin on 29/04/2018.
  */
 @RestController
-@RequestMapping("secured")
+@RequestMapping("defended")
 public class ProtectedPingPongController {
 
   private PingPongService pingPongService;
@@ -34,7 +34,7 @@ public class ProtectedPingPongController {
   Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
     return ((SecureHandlerFunc) authUser ->
         secureUserService.authenticate(authUser) // Авторизуем пользователя
-    ).getAuthUser(request, SecuredAuthority.PING)
+    ).getAuthUser(request, DefendedAuthority.PING)
         .map(authUser -> // получаме авторизованного пользователя
             ((TrustedHandlerFunc<PingPayload>) (data) ->
                 pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе

@@ -41,7 +41,7 @@
         │   ├── ErrorMessages.java
         │   ├── IAuthority.java                     # Интерфейс для описания доступов
         │   ├── RequestConstants.java
-        │   ├── SecuredAuthority.java               # Описание доступов для защищенного контроллера
+        │   ├── DefendedAuthority.java               # Описание доступов для защищенного контроллера
         │   └── SecurityConfig.java                 # Конфигурация CORS через Spring Security
         ├── controller
         │   ├── AuthController.java                 # Контроллер аутентификации
@@ -156,7 +156,7 @@ public @ResponseBody
 Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
   return ((SecureHandlerFunc) authUser ->
       secureUserService.authenticate(authUser) // Авторизуем пользователя
-  ).getAuthUser(request, SecuredAuthority.PING)
+  ).getAuthUser(request, DefendedAuthority.PING)
       .map(authUser -> // получаем авторизованного пользователя
           ((TrustedHandlerFunc<PingPayload>) (data) ->
               pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе

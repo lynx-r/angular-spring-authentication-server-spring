@@ -7,12 +7,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public enum SecuredAuthority implements IAuthority {
+public enum DefendedAuthority implements IAuthority {
   PING(Constants.SECURE_PING_PONG_ROLES);
 
   private Set<EnumAuthority> authorities;
 
-  SecuredAuthority(Set<EnumAuthority> authorities) {
+  DefendedAuthority(Set<EnumAuthority> authorities) {
     this.authorities = authorities;
   }
 
@@ -21,7 +21,7 @@ public enum SecuredAuthority implements IAuthority {
     return authorities;
   }
 
-  public SecuredAuthority setAuthorities(Set<EnumAuthority> authorities) {
+  public DefendedAuthority setAuthorities(Set<EnumAuthority> authorities) {
     this.authorities = authorities;
     return this;
   }
