@@ -19,7 +19,7 @@
 
 ## О чем эта статья
 
-В этой статье я расскажу как добавить на ваш проект аутентификацию без помощи готовых решений для данной задачи. Я предлагаю посмотреть на приложения на Angular и Spring [Репозиторий клиента на Angular-ngrx-starter](https://github.com/lynx-r/angular-spring-authentication-web-angular) [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
+В этой статье, я расскажу как написать простейшую аутентификацию без помощи готовых решений для данной задачи. Она может быть полезна для новичков, которые хотят написать своё AAA (Authentication, Authorization, and Accounting). [Репозиторий клиента на Angular и ngrx](https://github.com/lynx-r/angular-spring-authentication-web-angular) и [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
 
 Здесь мы рассмотрим клиентскую часть на Spring.
 
