@@ -175,7 +175,7 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
 
 Нужно отметить, что всё же пришлось подключить Spring Security для работы с CORS.
 
-Для добавления соответствующих заголовков был использован и немного переработан код с StackOverflow. Он находится в классах `CorsFilterAdapter` и `SecurityConfig`.
+Для добавления необходимых заголовков был использован и немного переработан код с StackOverflow. Он находится в классах `CorsFilterAdapter` и `SecurityConfig`.
 
 # Заключение
 
