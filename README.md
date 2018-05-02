@@ -77,7 +77,7 @@
 
 ## Сервис аутентификации/авторизации/регистрации (SecureUserService)
 
-`SecureUserService` главный сервис данной статьи - то, ради чего она задумывалась. Квест по осознанию такой простой и в тоже время насущной для новичка темы. 
+`SecureUserService` главный сервис данной статьи - то, ради чего она задумывалась. Квест по осознанию такой простой и в тоже время насущной для новичка темы.
 
 В нем реализованы следующие методы:
 
@@ -115,6 +115,7 @@ if (clientDigest.equals(secureUser.getDigest())) {
   Set<EnumAuthority> authorities = secureUser.getAuthorities();
   AuthUser authUser = AuthUser.simpleUser(userId, username, accessToken.accessToken, userSession, authorities);
   return authUser;
+}
 ```
 
 В общем, стандартный алгоритм.
