@@ -15,11 +15,11 @@
 
 # Детали
 
-# Пример самописной аутентификации на Angular и Spring (сервер на Spring)
+# Аутентификации на Angular и Spring без Spring Security (сервер на Spring)
 
 ## О чем эта статья
 
-В этой статье, я расскажу как написать простейшую аутентификацию без помощи готовых решений для данной задачи. Она может быть полезна для новичков, которые хотят написать своё AAA (Authentication, Authorization, and Accounting). [Репозиторий клиента на Angular и ngrx](https://github.com/lynx-r/angular-spring-authentication-web-angular) и [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
+В этой статье, я расскажу как написать простую аутентификацию без помощи готовых решений для данной задачи. Она может быть полезна для новичков, которые хотят написать своё AAA (Authentication, Authorization, and Accounting). [Репозиторий клиента на Angular и ngrx](https://github.com/lynx-r/angular-spring-authentication-web-angular) и [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
 
 Здесь мы рассмотрим клиентскую часть на Spring.
 
@@ -41,7 +41,7 @@
         │   ├── ErrorMessages.java
         │   ├── IAuthority.java                     # Интерфейс для описания доступов
         │   ├── RequestConstants.java
-        │   ├── DefendedAuthority.java               # Описание доступов для защищенного контроллера
+        │   ├── DefendedAuthority.java              # Описание доступов для защищенного контроллера
         │   └── SecurityConfig.java                 # Конфигурация CORS через Spring Security
         ├── controller
         │   ├── AuthController.java                 # Контроллер аутентификации
@@ -66,7 +66,7 @@
         │   ├── Payload.java                        # Интерфейс с описание классов для сериализации/десериализации в JSON
         │   ├── PingPayload.java                    # Данные, которые получаем от клиента
         │   ├── PongPayload.java                    # Данные, которые возвращаем клиенту
-        │   ├── UserCredentials.java                   # Информация для регистрации/аутентификации пользователя
+        │   ├── UserCredentials.java                # Информация для регистрации/аутентификации пользователя
         │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
         └── service
             ├── PingPongService.java                # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
@@ -75,7 +75,7 @@
     
 ## Сервис аутентификации/авторизации/регистрации (SecureUserService)
 
-`SecureUserService` главный сервис данной статьи - то, ради чего она задумывалась. Квест по осознанию такой простой и в тоже время насущной для новичка темы.
+`SecureUserService` главный сервис данной статьи - то, ради чего она задумывалась.
 
 В нем реализованы следующие методы:
 
@@ -145,7 +145,7 @@ Answer authorize(@RequestBody UserCredentials usercredentials, HttpServletRespon
 
 ## Контроллер обработки запросов клиента (ProtectedPingPongController)
 
-И, наконец, рассмотри обработчик пользовательских запросов. Назовем его `PingPongService`. По условию, этот контроллер не должен быть доступен для не авторизованных клиентов.
+Рассмотри обработчик пользовательских запросов. Назовем его `PingPongService`. По условию, этот контроллер не должен быть доступен для не авторизованных клиентов.
 
 Приведу пример создания ответа на запрос `ping`:
 
@@ -153,22 +153,21 @@ Answer authorize(@RequestBody UserCredentials usercredentials, HttpServletRespon
 @PostMapping("ping")
 public @ResponseBody
 Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
-  return ((SecureHandlerFunc) authUser ->
-      secureUserService.authenticate(authUser) // Авторизуем пользователя
-  ).getAuthUser(request, DefendedAuthority.PING)
+  return authenticateRequestService
+      .getAuthenticatedUser(request, DefendedAuthority.PING)
       .map(authUser -> // получаем авторизованного пользователя
           ((TrustedHandlerFunc<PingPayload>) (data) ->
               pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
                   .map(Answer::ok)
                   .orElseGet(Answer::forbidden)
-          ).handleRequest(response, ping, authUser) // обрабатываем запрос в интерфейсе
-      ).orElseGet(Answer::forbidden);
+          ).handleRequest(response, ping, authUser) // обрабатываем запрос
+      ).orElseThrow(AuthException::forbidden);
 }
 ```
 
 Здесь используются два функциональных интерфейса: `SecureHandlerFunc` и `TrustedHandlerFunc`. Первый проверяет пользовательские заголовки, пришедшие с клиента, создаёт из них "token" `AuthUser` и передаёт их в следующий метод интерфейса  `TrustedHandlerFunc`. Здесь, ожидается, что "токен" - авторизованный пользователь.
 
-Детали реализации этих интерфейсов я приводить не буду, так как они уже описаны в статье указанной ранее. Скажу лишь, что отличие только в разбиение полномочий на авторизацию данных пришедших в заголовках и отправки результата клиенту.
+Детали реализации этих интерфейсов я приводить не буду, так как они уже описаны в статье указанной ранее. Скажу лишь, что отличие только в разбиение обязанностей на авторизацию данных пришедших в заголовках и отправки результата клиенту.
 
 # Не обошлось без Spring Security
 
