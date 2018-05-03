@@ -1,7 +1,6 @@
 package com.example.backendspring.function;
 
 import com.example.backendspring.config.IAuthority;
-import com.example.backendspring.exception.AuthException;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumAuthority;
 import com.example.backendspring.service.SecureUserService;
@@ -28,17 +27,14 @@ public class AuthenticateRequestService {
 
   public Optional<AuthUser> getAuthenticatedUser(HttpServletRequest request, IAuthority authority) {
     AuthUser clientAuthUser = getAuthUserFromRequest(request);
-    return
-        Optional.of(
-            secureUserService.authenticate(clientAuthUser)
-                .map(authUser -> {
-                  if (!hasAuthorities(authUser.getAuthorities(), authority.getAuthorities())) {
-                    return null;
-                  }
-                  return authUser;
-                })
-                .orElseThrow(AuthException::forbidden)
-        );
+    return secureUserService
+        .authenticate(clientAuthUser)
+        .map(authUser -> {
+          if (!hasAuthorities(authUser.getAuthorities(), authority.getAuthorities())) {
+            return null;
+          }
+          return authUser;
+        });
   }
 
   private boolean hasAuthorities(Set<EnumAuthority> clientAuthorities, Set<EnumAuthority> allowedAuthorities) {

@@ -5,11 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import static java.net.HttpURLConnection.HTTP_CREATED;
-import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
-import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.*;
 
-//@JsonDeserialize(using = AnswerDeserializer.class)
 @NoArgsConstructor
 @Data
 public class Answer {
@@ -56,6 +53,6 @@ public class Answer {
   }
 
   public static Answer forbidden() {
-    return Answer.error(HTTP_FORBIDDEN, "Доступ запрещен");
+    return Answer.error(HTTP_FORBIDDEN, "Access denied");
   }
 }

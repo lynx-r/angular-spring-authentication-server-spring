@@ -1,6 +1,7 @@
 package com.example.backendspring.controller;
 
 import com.example.backendspring.config.DefendedAuthority;
+import com.example.backendspring.exception.AuthException;
 import com.example.backendspring.function.AuthenticateRequestService;
 import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.model.Answer;
@@ -31,15 +32,14 @@ public class ProtectedPingPongController {
   @PostMapping("ping")
   public @ResponseBody
   Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
-    return
-        authenticateRequestService
-            .getAuthenticatedUser(request, DefendedAuthority.PING)
-            .map(authUser -> // получаем авторизованного пользователя
-                ((TrustedHandlerFunc<PingPayload>) (data) ->
-                    pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
-                        .map(Answer::ok)
-                        .orElseGet(Answer::forbidden)
-                ).handleRequest(response, ping, authUser) // обрабатываем запрос
-            ).orElseGet(Answer::forbidden);
+    return authenticateRequestService
+        .getAuthenticatedUser(request, DefendedAuthority.PING)
+        .map(authUser -> // получаем авторизованного пользователя
+            ((TrustedHandlerFunc<PingPayload>) (data) ->
+                pingPongService.getPong(data, authUser) // обрабатываем запрос пользователя в сервисе
+                    .map(Answer::ok)
+                    .orElseGet(Answer::forbidden)
+            ).handleRequest(response, ping, authUser) // обрабатываем запрос
+        ).orElseThrow(AuthException::forbidden);
   }
 }
