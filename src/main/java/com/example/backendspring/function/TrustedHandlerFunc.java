@@ -11,10 +11,12 @@ import javax.servlet.http.HttpServletResponse;
  * Created by Aleksey Popryaduhin on 10:52 29/09/2017.
  */
 @FunctionalInterface
-public interface TrustedHandlerFunc<T extends Payload> extends BaseHandlerFunc<T> {
+public interface TrustedHandlerFunc<T extends Payload> {
+
+  Answer process(T data);
 
   default Answer handleRequest(HttpServletResponse response, T data, AuthUser token) {
-    Answer answer = getAnswer(response, data);
+    Answer answer = process(data);
     // Подписываем ответ токеном. Токен должен быть действительным
     answer.setAuthUser(token);
     response.setStatus(answer.getStatusCode());
@@ -22,7 +24,7 @@ public interface TrustedHandlerFunc<T extends Payload> extends BaseHandlerFunc<T
   }
 
   default Answer handleAuthRequest(HttpServletResponse response, T data) {
-    Answer answer = getAnswer(response, data);
+    Answer answer = process(data);
     // Ответ является токеном
     answer.setAuthUser((AuthUser) answer.getBody());
     response.setStatus(answer.getStatusCode());

@@ -33,9 +33,9 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private CorsFilter corsFilter() {
     return new CorsFilterAdapter(
-        appProperties.getClientUrls(),
-        appProperties.getCorsHeaders(),
-        appProperties.getCorsMethods())
+        appProperties.getOriginUrl(),
+        appProperties.getHeaders(),
+        appProperties.getMethods())
         .corsFilter();
   }
 }

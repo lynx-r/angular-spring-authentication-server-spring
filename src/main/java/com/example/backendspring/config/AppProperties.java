@@ -11,18 +11,15 @@ import org.springframework.stereotype.Component;
 @Getter
 public class AppProperties {
 
-  @Value("${CLIENT_URL}")
-  private String clientUrls;
+  @Value("${ORIGIN_URL}")
+  private String originUrl;
 
   @Value("${HEADERS}")
-  private String corsHeaders;
+  private String headers;
 
   @Value("${METHODS}")
-  private String corsMethods;
+  private String methods;
 
   @Value("${TOKEN_LENGTH}")
   private int tokenLength;
-
-  @Value("${RANDOM_STRING_LENGTH}")
-  private int randomStringLength;
 }

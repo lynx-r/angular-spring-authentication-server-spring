@@ -4,12 +4,11 @@ import com.example.backendspring.config.AppProperties;
 import com.example.backendspring.dao.SecureUserDao;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumAuthority;
-import com.example.backendspring.model.UserCredentials;
 import com.example.backendspring.model.SecureUser;
+import com.example.backendspring.model.UserCredentials;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -31,7 +30,6 @@ public class SecureUserService {
   private SecureUserDao secureUserDao;
   private AppProperties appProperties;
 
-  @Autowired
   public SecureUserService(SecureUserDao secureUserDao, AppProperties appProperties) {
     this.secureUserDao = secureUserDao;
     this.appProperties = appProperties;
@@ -169,7 +167,7 @@ public class SecureUserService {
 
   private void hashCredentials(UserCredentials userCredentials, SecureUser secureUser) throws NoSuchAlgorithmException {
     String credentials = userCredentials.getCredentials();
-    String salt = ":" + getRandomString20();
+    String salt = getRandomString20();
     secureUser.setSalt(salt);
     String digest = SecureUtils.digest(credentials + salt);
     secureUser.setDigest(digest);
