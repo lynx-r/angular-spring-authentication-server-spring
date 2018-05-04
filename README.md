@@ -15,19 +15,17 @@
 
 # Детали
 
-# Аутентификации на Angular и Spring без Spring Security (сервер на Spring)
+# Часть 2. Сервер на Spring
 
 ## О чем эта статья
 
 В этой статье, я расскажу как написать простую аутентификацию без помощи готовых решений для данной задачи. Она может быть полезна для новичков, которые хотят написать своё AAA (Authentication, Authorization, and Accounting). [Репозиторий клиента на Angular и ngrx](https://github.com/lynx-r/angular-spring-authentication-web-angular) и [Репозиторий сервера на Spring](https://github.com/lynx-r/angular-spring-authentication-server-spring).
 
-Здесь мы рассмотрим клиентскую часть на Spring.
+В данной статье я сделаю выдержки кода серверной части на Spring.
 
 <cut/>
 
 # Сервер аутентификации на Spring
-
-Начнём с основного? Пожалуй, да. Посмотрим на структуру проекта сервера.
 
 ## Структура проекта
 
@@ -35,39 +33,39 @@
     └── backendspring
         ├── BackendspringApplication.java           # Spring приложение
         ├── config
-        │   ├── AppProperties.java
-        │   ├── AuthAuthority.java                  # Описание доступов для контроллера авторизации пользователей
-        │   ├── CorsFilterAdapter.java              # Описание CORS
-        │   ├── ErrorMessages.java
-        │   ├── IAuthority.java                     # Интерфейс для описания доступов
-        │   ├── RequestConstants.java
-        │   ├── DefendedAuthority.java              # Описание доступов для защищенного контроллера
-        │   └── SecurityConfig.java                 # Конфигурация CORS через Spring Security
+        │   ├── AppProperties.java
+        │   ├── AuthAuthority.java                  # Описание доступов для контроллера авторизации пользователей
+        │   ├── CorsFilterAdapter.java              # Описание CORS
+        │   ├── ErrorMessages.java
+        │   ├── IAuthority.java                     # Интерфейс для описания доступов
+        │   ├── RequestConstants.java
+        │   ├── DefendedAuthority.java              # Описание доступов для защищенного контроллера
+        │   └── SecurityConfig.java                 # Конфигурация CORS через Spring Security
         ├── controller
-        │   ├── AuthController.java                 # Контроллер аутентификации
-        │   └── ProtectedPingPongController.java    # Защищенный контроллер
+        │   ├── AuthController.java                 # Контроллер аутентификации
+        │   └── ProtectedPingPongController.java    # Защищенный контроллер
         ├── dao
-        │   ├── BaseDao.java
-        │   └── SecureUserDao.java                  # DAO для хранящегося в базе информации о пользователе
+        │   ├── BaseDao.java
+        │   └── SecureUserDao.java                  # DAO для хранящегося в базе информации о пользователе
         ├── exception
-        │   ├── AuthException.java
-        │   └── PingPongException.java
+        │   ├── AuthException.java
+        │   └── PingPongException.java
         ├── function
-        │   ├── BaseHandlerFunc.java                # Рутинные методы аутентификации для функционального интерфейса ModelHandlerFunc.java
-        │   ├── TrustedHandlerFunc.java             # Функциональный интерфейс обрабатывающий проверенные запросы клиента
-        │   └── SecureHandlerFunc.java              # Функциональный интерфейс выполняющий проверку запросов клиента
+        │   ├── BaseHandlerFunc.java                # Рутинные методы аутентификации для функционального интерфейса ModelHandlerFunc.java
+        │   ├── TrustedHandlerFunc.java             # Функциональный интерфейс обрабатывающий проверенные запросы клиента
+        │   └── SecureHandlerFunc.java              # Функциональный интерфейс выполняющий проверку запросов клиента
         ├── model
-        │   ├── Answer.java                         # Структура данных - ответ сервера
-        │   ├── AuthUser.java                       # Данные о пользователе используемые для его аутентификации
-        │   ├── BaseDomain.java
-        │   ├── EnumAuthority.java                  # Enum с описание доступов на сайт
-        │   ├── MessagePayload.java
-        │   ├── MessageResponse.java
-        │   ├── Payload.java                        # Интерфейс с описание классов для сериализации/десериализации в JSON
-        │   ├── PingPayload.java                    # Данные, которые получаем от клиента
-        │   ├── PongPayload.java                    # Данные, которые возвращаем клиенту
-        │   ├── UserCredentials.java                # Информация для регистрации/аутентификации пользователя
-        │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
+        │   ├── Answer.java                         # Структура данных - ответ сервера
+        │   ├── AuthUser.java                       # Данные о пользователе используемые для его аутентификации
+        │   ├── BaseDomain.java
+        │   ├── EnumAuthority.java                  # Enum с описание доступов на сайт
+        │   ├── MessagePayload.java
+        │   ├── MessageResponse.java
+        │   ├── Payload.java                        # Интерфейс с описание классов для сериализации/десериализации в JSON
+        │   ├── PingPayload.java                    # Данные, которые получаем от клиента
+        │   ├── PongPayload.java                    # Данные, которые возвращаем клиенту
+        │   ├── UserCredentials.java                # Информация для регистрации/аутентификации пользователя
+        │   └── SecureUser.java                     # Хранимая в БД информация о пользователе
         └── service
             ├── PingPongService.java                # Сервис, которые обрабатывает запрос клиента и возвращает данные ответа
             ├── SecureUserService.java              # ***Собственно, сервис в котором производится аутентификация/авторизация***
@@ -181,5 +179,6 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
 
 # Ссылки
 
+* [Часть 1. Клиент на Angular](https://habr.com/post/354860/)
 * [Spring](http://spring.io/)
 * [Создание простого RESTful API с Spark Framework](https://habr.com/post/352732/)
