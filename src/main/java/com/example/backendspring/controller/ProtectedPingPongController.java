@@ -29,6 +29,14 @@ public class ProtectedPingPongController {
     this.authRequestService = authRequestService;
   }
 
+  /**
+   * Защищённый сервис `ping`. Проверка аутентификации производится прямо в контроллере,
+   * но так же её можно добавить в фильтры, которые конфигурируются в `SecurityConfig`
+   * @param ping
+   * @param request
+   * @param response
+   * @return
+   */
   @PostMapping("ping")
   public @ResponseBody
   Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
