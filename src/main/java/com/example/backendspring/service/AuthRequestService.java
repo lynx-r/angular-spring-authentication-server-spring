@@ -1,9 +1,8 @@
-package com.example.backendspring.function;
+package com.example.backendspring.service;
 
 import com.example.backendspring.config.IAuthority;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.EnumAuthority;
-import com.example.backendspring.service.SecureUserService;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +16,11 @@ import static com.example.backendspring.config.RequestConstants.USER_SESSION_HEA
  * Created by Aleksey Popryaduhin on 16:37 01/10/2017.
  */
 @Service
-public class AuthenticateRequestService {
+public class AuthRequestService {
 
   private SecureUserService secureUserService;
 
-  public AuthenticateRequestService(SecureUserService secureUserService) {
+  public AuthRequestService(SecureUserService secureUserService) {
     this.secureUserService = secureUserService;
   }
 

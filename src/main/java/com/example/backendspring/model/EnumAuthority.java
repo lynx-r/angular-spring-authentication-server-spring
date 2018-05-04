@@ -8,7 +8,6 @@ import java.util.Set;
  */
 public enum EnumAuthority {
   USER,
-  BAN,
   ANONYMOUS;
 
   public static boolean hasAuthorities(Set<EnumAuthority> clientAuthorities, Set<EnumAuthority> allowedAuthorities) {

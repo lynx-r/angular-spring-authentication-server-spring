@@ -2,7 +2,7 @@ package com.example.backendspring.controller;
 
 import com.example.backendspring.config.DefendedAuthority;
 import com.example.backendspring.exception.AuthException;
-import com.example.backendspring.function.AuthenticateRequestService;
+import com.example.backendspring.service.AuthRequestService;
 import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
@@ -21,11 +21,11 @@ import javax.validation.Valid;
 @RequestMapping("security")
 public class AuthController {
 
-  private AuthenticateRequestService authenticateRequestService;
+  private AuthRequestService authRequestService;
   private SecureUserService secureUserService;
 
-  public AuthController(AuthenticateRequestService authenticateRequestService, SecureUserService secureUserService) {
-    this.authenticateRequestService = authenticateRequestService;
+  public AuthController(AuthRequestService authRequestService, SecureUserService secureUserService) {
+    this.authRequestService = authRequestService;
     this.secureUserService = secureUserService;
   }
 
@@ -66,7 +66,7 @@ public class AuthController {
   public @ResponseBody
   Answer logout(HttpServletRequest request, HttpServletResponse response) {
     // обрабатываем авторизованные запрос на выход
-    return authenticateRequestService
+    return authRequestService
         .getAuthenticatedUser(request, DefendedAuthority.PING)
         .map(authUser -> // получаем авторизованного пользователя
             ((TrustedHandlerFunc<AuthUser>) (data) ->

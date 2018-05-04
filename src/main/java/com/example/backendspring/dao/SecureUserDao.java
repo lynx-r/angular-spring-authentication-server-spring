@@ -22,6 +22,12 @@ public class SecureUserDao extends BaseDao<SecureUser> {
     return findByAttributeIndex(username, "username");
   }
 
+  /**
+   * Немного магии с Reflection
+   * @param attribute
+   * @param attributeName
+   * @return
+   */
   private Optional<SecureUser> findByAttributeIndex(String attribute, String attributeName) {
     Optional<SecureUser> secureUserOptional = db.values()
         .stream()

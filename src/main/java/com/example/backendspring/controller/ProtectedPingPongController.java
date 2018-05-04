@@ -2,7 +2,7 @@ package com.example.backendspring.controller;
 
 import com.example.backendspring.config.DefendedAuthority;
 import com.example.backendspring.exception.AuthException;
-import com.example.backendspring.function.AuthenticateRequestService;
+import com.example.backendspring.service.AuthRequestService;
 import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.PingPayload;
@@ -21,18 +21,18 @@ import javax.servlet.http.HttpServletResponse;
 public class ProtectedPingPongController {
 
   private PingPongService pingPongService;
-  private AuthenticateRequestService authenticateRequestService;
+  private AuthRequestService authRequestService;
 
   @Autowired
-  public ProtectedPingPongController(PingPongService pingPongService, AuthenticateRequestService authenticateRequestService) {
+  public ProtectedPingPongController(PingPongService pingPongService, AuthRequestService authRequestService) {
     this.pingPongService = pingPongService;
-    this.authenticateRequestService = authenticateRequestService;
+    this.authRequestService = authRequestService;
   }
 
   @PostMapping("ping")
   public @ResponseBody
   Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServletResponse response) {
-    return authenticateRequestService
+    return authRequestService
         .getAuthenticatedUser(request, DefendedAuthority.PING)
         .map(authUser -> // получаем авторизованного пользователя
             ((TrustedHandlerFunc<PingPayload>) (data) ->

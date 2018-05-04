@@ -29,7 +29,7 @@ public class SecureUser extends BaseDomain {
   private String digest;
 
   /**
-   * random string with ":" prefix
+   * random string
    */
   private String salt;
 
@@ -49,7 +49,7 @@ public class SecureUser extends BaseDomain {
   private int tokenLength;
 
   /**
-   * unecrypted user token. MUST NOT BE REVEAL
+   * unecrypted user token
    */
   private String secureToken;
 

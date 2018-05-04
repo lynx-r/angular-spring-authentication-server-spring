@@ -8,6 +8,10 @@ import java.util.*;
 
 import static java.lang.String.format;
 
+/**
+ * В место БД, просто HashMap 😂🛴🗯
+ * @param <T>
+ */
 public class BaseDao<T extends BaseDomain> {
 
   private Logger logger;

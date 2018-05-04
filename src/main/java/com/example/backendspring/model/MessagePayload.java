@@ -14,16 +14,4 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = MessageResponse.class, name = "message"),
 })
 public interface MessagePayload {
-  int getCode();
-
-  void setCode(int statusCode);
-
-  String getMessage();
-
-  void setMessage(String message);
-
-  default MessagePayload message(String message) {
-    setMessage(message);
-    return this;
-  }
 }

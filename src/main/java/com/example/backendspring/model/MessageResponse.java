@@ -25,11 +25,6 @@ public class MessageResponse implements MessagePayload {
     this.message = message;
   }
 
-  @Override
-  public void setCode(int code) {
-    this.code = code;
-  }
-
   public static MessageResponse error(int statusCode, String message) {
     return new MessageResponse(statusCode, message);
   }
