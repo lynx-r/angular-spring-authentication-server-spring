@@ -14,7 +14,7 @@ import java.util.Optional;
 public class PingPongService {
 
   public Optional<PongPayload> getPong(PingPayload data, AuthUser authUser) {
-    return Optional.of(new PongPayload(data.getPing() + " from " + authUser.getUsername() + " and PONG from server"));
+    return Optional.of(new PongPayload(data.getPing() + " from " + authUser.getEmail() + " and PONG from server"));
   }
 
 }

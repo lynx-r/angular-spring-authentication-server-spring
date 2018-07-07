@@ -109,7 +109,7 @@ if (clientDigest.equals(secureUser.getDigest())) {
   // Возвращем AccessToken, сессию и открытые данные пользователя клиенту
   String userId = secureUser.getId();
   Set<EnumAuthority> authorities = secureUser.getAuthorities();
-  AuthUser authUser = AuthUser.simpleUser(userId, username, accessToken.accessToken, userSession, authorities);
+  AuthUser authUser = AuthUser.simpleUser(userId, email, accessToken.accessToken, userSession, authorities);
   return authUser;
 }
 ```

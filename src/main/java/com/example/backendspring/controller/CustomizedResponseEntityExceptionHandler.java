@@ -1,6 +1,6 @@
 package com.example.backendspring.controller;
 
-import com.example.backendspring.exception.AuthException;
+import com.example.backendspring.exception.RequestException;
 import com.example.backendspring.model.Answer;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -30,8 +30,8 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
     return new ResponseEntity<>(Answer.error(HTTP_INTERNAL_ERROR, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  @ExceptionHandler(AuthException.class)
-  public final ResponseEntity<Answer> handleUserNotFoundException(AuthException ex) {
+  @ExceptionHandler(RequestException.class)
+  public final ResponseEntity<Answer> handleUserNotFoundException(RequestException ex) {
     return new ResponseEntity<>(Answer.error(ex.getStatus(), ex.getMessage()), HttpStatus.resolve(ex.getStatus()));
   }
 

@@ -1,12 +1,11 @@
 package com.example.backendspring.controller;
 
 import com.example.backendspring.config.DefendedAuthority;
-import com.example.backendspring.exception.AuthException;
-import com.example.backendspring.service.AuthRequestService;
 import com.example.backendspring.function.TrustedHandlerFunc;
 import com.example.backendspring.model.Answer;
 import com.example.backendspring.model.AuthUser;
 import com.example.backendspring.model.UserCredentials;
+import com.example.backendspring.service.AuthRequestService;
 import com.example.backendspring.service.SecureUserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,14 +28,30 @@ public class AuthController {
     this.secureUserService = secureUserService;
   }
 
+  @PostMapping("auth-request")
+  public @ResponseBody
+  Answer authRequest(@Valid @RequestBody UserCredentials userCredentials, HttpServletRequest request, HttpServletResponse response) {
+    // возвращаем клиенту соль, cost и misc
+    return ((TrustedHandlerFunc<UserCredentials>) (data) ->
+        Answer.ok(secureUserService.authRequest(data)))
+        .handleAuthRequest(response, userCredentials);
+  }
+
   @PostMapping("register")
   public @ResponseBody
   Answer register(@Valid @RequestBody UserCredentials userCredentials, HttpServletRequest request, HttpServletResponse response) {
     // обрабатываем не авторизованные запрос на регистрацию
     return ((TrustedHandlerFunc<UserCredentials>) (data) ->
-        secureUserService.register(data)
-            .map(Answer::ok)
-            .orElseGet(Answer::forbidden))
+        Answer.ok(secureUserService.register(data)))
+        .handleAuthRequest(response, userCredentials);
+  }
+
+  @PutMapping("register")
+  public @ResponseBody
+  Answer postRegister(@Valid @RequestBody UserCredentials userCredentials, HttpServletRequest request, HttpServletResponse response) {
+    // обрабатываем не авторизованные запрос на регистрацию
+    return ((TrustedHandlerFunc<UserCredentials>) (data) ->
+        Answer.ok(secureUserService.postRegister(data)))
         .handleAuthRequest(response, userCredentials);
   }
 
@@ -45,9 +60,7 @@ public class AuthController {
   Answer authorize(@Valid @RequestBody UserCredentials userCredentials, HttpServletRequest request, HttpServletResponse response) {
     // обрабатываем не авторизованные запрос на авторизацию
     return ((TrustedHandlerFunc<UserCredentials>) (data) ->
-        secureUserService.authorize(data)
-            .map(Answer::ok)
-            .orElseGet(Answer::forbidden))
+        Answer.ok(secureUserService.authorize(data)))
         .handleAuthRequest(response, userCredentials);
   }
 
@@ -56,9 +69,7 @@ public class AuthController {
   Answer authenticate(@RequestBody AuthUser authUser, HttpServletRequest request, HttpServletResponse response) {
     // обрабатываем не авторизованные запрос на аутентификацию
     return ((TrustedHandlerFunc<AuthUser>) (data) ->
-        secureUserService.authenticate(data)
-            .map(Answer::ok)
-            .orElseGet(Answer::forbidden))
+        Answer.ok(secureUserService.authenticate(data)))
         .handleAuthRequest(response, authUser);
   }
 
@@ -66,14 +77,11 @@ public class AuthController {
   public @ResponseBody
   Answer logout(HttpServletRequest request, HttpServletResponse response) {
     // обрабатываем авторизованные запрос на выход
-    return authRequestService
-        .getAuthenticatedUser(request, DefendedAuthority.PING)
-        .map(authUser -> // получаем авторизованного пользователя
-            ((TrustedHandlerFunc<AuthUser>) (data) ->
-                secureUserService.logout(data)
-                    .map(Answer::ok)
-                    .orElseGet(Answer::forbidden)
-            ).handleAuthRequest(response, authUser) // обрабатываем запрос
-        ).orElseThrow(AuthException::forbidden);
+    AuthUser authUser = authRequestService
+        .getAuthenticatedUser(request, DefendedAuthority.PING);
+    // получаем авторизованного пользователя
+    return ((TrustedHandlerFunc<AuthUser>) (data) ->
+        Answer.ok(secureUserService.logout(data))
+    ).handleAuthRequest(response, authUser); // обрабатываем запрос
   }
 }

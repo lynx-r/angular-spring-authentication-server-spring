@@ -2,6 +2,11 @@ spring:
   profiles:
     active: @spring.profiles.active@
 
+DOMAIN: example.com
+SYS_SIGMA: V>K0!PW`ojeK_'9"~R1;s(!Fx6PnO&Nk
+COST: 1
+MISC: 8
+
 TOKEN_LENGTH: 16
 RANDOM_STRING_LENGTH: 20
 

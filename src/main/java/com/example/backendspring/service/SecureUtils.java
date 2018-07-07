@@ -53,8 +53,13 @@ public class SecureUtils {
     return null;
   }
 
-  public static String digest(String data) throws NoSuchAlgorithmException {
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    return new String(digest.digest(data.getBytes(StandardCharsets.UTF_8)));
+  public static String digest(String data) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-512");
+      return new String(digest.digest(data.getBytes(StandardCharsets.UTF_8)));
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Unable to get digest");
+    }
   }
 }

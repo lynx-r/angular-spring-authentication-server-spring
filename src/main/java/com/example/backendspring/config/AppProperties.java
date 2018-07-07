@@ -22,4 +22,17 @@ public class AppProperties {
 
   @Value("${TOKEN_LENGTH}")
   private int tokenLength;
+
+  @Value("${DOMAIN}")
+  private String domain;
+
+  @Value("${SYS_SIGMA}")
+  private String sysSigma;
+
+  @Value("${COST}")
+  private int cost;
+
+  @Value("${MISC}")
+  private int misc;
 }
+

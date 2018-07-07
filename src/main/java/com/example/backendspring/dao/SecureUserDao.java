@@ -19,7 +19,7 @@ public class SecureUserDao extends BaseDao<SecureUser> {
   }
 
   public Optional<SecureUser> findByUsername(String username) {
-    return findByAttributeIndex(username, "username");
+    return findByAttributeIndex(username, "email");
   }
 
   /**

@@ -19,14 +19,18 @@ import java.util.Set;
 public class SecureUser extends BaseDomain {
   private String id;
 
-  private String username;
+  private String email;
 
   private Set<EnumAuthority> authorities = new HashSet<>();
 
   /**
-   * hash of user:password:salt
+   * hash of user:passwordHash:salt
    */
-  private String digest;
+  private String sigma;
+
+  private int cost;
+
+  private int misc;
 
   /**
    * random string
@@ -37,6 +41,11 @@ public class SecureUser extends BaseDomain {
    * key for encryption
    */
   private String key;
+
+  /**
+   * key for encryption
+   */
+  private String passwordHash;
 
   /**
    * init vector for encryption
@@ -71,7 +80,7 @@ public class SecureUser extends BaseDomain {
   public String toString() {
     return new ToStringBuilder(this)
         .append("id", id)
-        .append("username", username)
+        .append("email", email)
         .append("authorities", authorities)
         .append("accessToken", accessToken)
         .append("userSession", userSession)

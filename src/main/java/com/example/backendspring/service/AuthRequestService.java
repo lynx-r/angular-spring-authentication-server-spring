@@ -6,7 +6,6 @@ import com.example.backendspring.model.EnumAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.example.backendspring.config.RequestConstants.ACCESS_TOKEN_HEADER;
@@ -24,16 +23,13 @@ public class AuthRequestService {
     this.secureUserService = secureUserService;
   }
 
-  public Optional<AuthUser> getAuthenticatedUser(HttpServletRequest request, IAuthority authority) {
+  public AuthUser getAuthenticatedUser(HttpServletRequest request, IAuthority authority) {
     AuthUser clientAuthUser = getAuthUserFromRequest(request);
-    return secureUserService
-        .authenticate(clientAuthUser)
-        .map(authUser -> {
-          if (!hasAuthorities(authUser.getAuthorities(), authority.getAuthorities())) {
-            return null;
-          }
-          return authUser;
-        });
+    AuthUser authUser = secureUserService.authenticate(clientAuthUser);
+    if (!hasAuthorities(authUser.getAuthorities(), authority.getAuthorities())) {
+      return null;
+    }
+    return authUser;
   }
 
   private boolean hasAuthorities(Set<EnumAuthority> clientAuthorities, Set<EnumAuthority> allowedAuthorities) {
