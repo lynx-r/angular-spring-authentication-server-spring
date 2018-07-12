@@ -182,3 +182,8 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
 * [Часть 1. Клиент на Angular](https://habr.com/post/354860/)
 * [Spring](http://spring.io/)
 * [Создание простого RESTful API с Spark Framework](https://habr.com/post/352732/)
+
+## UPD
+
+Добавлена ветка improved-security с хешированием паролей перед отправкой на сервер.
+Подробнее: https://eprint.iacr.org/2015/387.pdf
