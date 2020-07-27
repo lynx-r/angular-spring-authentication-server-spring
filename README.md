@@ -185,5 +185,5 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
 
 ## UPD
 
-Добавлена ветка [improved-security](tree/improved-security) с хешированием паролей перед отправкой на сервер.
+Добавлена ветка [improved-security](../tree/improved-security) с хешированием паролей перед отправкой на сервер.
 Подробнее: https://eprint.iacr.org/2015/387.pdf
