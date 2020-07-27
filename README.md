@@ -187,4 +187,4 @@ Answer ping(@RequestBody PingPayload ping, HttpServletRequest request, HttpServl
 
 Добавлена ветка [improved-security](../../tree/improved-security) с хешированием паролей перед отправкой на сервер.
 Подробнее: https://eprint.iacr.org/2015/387.pdf 
-или [Method to Protect Passwords in Databases for Web Applications](2015-387.pdf)
+или [Method to Protect Passwords in Databases for Web Applications](improved-security/2015-387.pdf)
